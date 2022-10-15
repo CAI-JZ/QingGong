@@ -18,6 +18,9 @@ public class PlayerController2D : MonoBehaviour
     private float JumpBuffer = 0.2f;
     private float JumpBufferTimer;
 
+    private float QiValue = 10;
+    [SerializeField] PlayerState.PLAYERSTATE State;
+
     [SerializeField]private Transform GroundCheck;
     [SerializeField]private LayerMask GroundLayer;
 
@@ -55,19 +58,18 @@ public class PlayerController2D : MonoBehaviour
             JumpBufferTimer -= Time.deltaTime;
             if (JumpBufferTimer < 0)
             {
-                //JumpBufferTimer = 0;
+                JumpBufferTimer = 0;
             }
         }
 
         Jump();
 
         //Debug.Log(_rigidbody.velocity);
-        Debug.Log(JumpBufferTimer);
+        Debug.Log(State);
     }
 
     private void FixedUpdate()
     {
-        //IsGround = GroundCheck
         Move(AxisX);
         
     }
