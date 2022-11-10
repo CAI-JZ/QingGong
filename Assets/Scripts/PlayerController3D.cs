@@ -15,21 +15,21 @@ public class PlayerController3D : MonoBehaviour
     //Move
     private float AxisX;
     [SerializeField] private float MoveSpeed = 200;
-
-    //Jump
+    
     private bool IsJump;
     private bool IsGrounded;
     private bool IsQi;
     private float FallMutiplier = 3f;
+
+    //Jump
     //[Range(5, 15)]
     [SerializeField] private float JumpVelocity = 7;
-
     private float coyoteJump = 0.2f;
     private float coyoteJumpTimer;
     private float JumpBuffer = 0.2f;
     private float JumpBufferTimer;
-    private bool CanDash;
 
+    //QI
     private float QiValue = 10;
     [SerializeField]private float qiMoveMul = 1;
     [SerializeField]private float qiJumpMul = 1;
@@ -41,6 +41,11 @@ public class PlayerController3D : MonoBehaviour
 
     private Rigidbody _rigidbody;
 
+    private bool rightRay, leftRay, upRay, downRay;
+    private RaycastHit rightInfo, leftInfo, upInfo, downInfo;
+    [SerializeField]private float rayDis = 1f;
+    
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -49,6 +54,7 @@ public class PlayerController3D : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        RayDetector();
         AxisX = Input.GetAxis("Horizontal");
         IsJump = Input.GetButtonDown("Jump");
         IsGrounded = Physics.CheckSphere(GroundCheck.position, 0.2f, GroundLayer);
@@ -77,10 +83,6 @@ public class PlayerController3D : MonoBehaviour
         if (IsJump)
         {
             JumpBufferTimer = JumpBuffer;
-            if (playerState == PLAYERSTATE.Qi)
-            {
-                CanDash = true;
-            }
         }
         else
         {
@@ -89,8 +91,7 @@ public class PlayerController3D : MonoBehaviour
             if (JumpBufferTimer < 0)
             {
                 JumpBufferTimer = 0;
-            }
-            CanDash = false;
+            }      
         }
     }
 
@@ -99,6 +100,20 @@ public class PlayerController3D : MonoBehaviour
         Move(AxisX);
         Jump();
         UseQi();
+    }
+
+    private void RayDetector()
+    {
+        rightRay = Physics.Raycast(transform.position, Vector3.right,out rightInfo, rayDis);
+        leftRay = Physics.Raycast(transform.position, Vector3.right, out leftInfo, rayDis);
+        upRay = Physics.Raycast(transform.position, Vector3.right, out upInfo, rayDis);
+        downRay = Physics.Raycast(transform.position, Vector3.right, out downInfo, rayDis);
+        Debug.DrawRay(transform.position, Vector3.right * rayDis, Color.red);
+
+        if ((rightRay || leftRay)&&( rightInfo.collider.tag == "Climbable" || leftInfo.collider.tag == "Climbable"))
+        {
+            Debug.Log("Can climb");
+        }
     }
 
     void Move(float inputX)
@@ -135,16 +150,7 @@ public class PlayerController3D : MonoBehaviour
                 _rigidbody.velocity += Vector3.up * Physics.gravity.y * (0.1f) * Time.deltaTime;
             }
         }
-        if (CanDash && !IsGrounded)
-        {
-            Vector3 dir = (Vector3.right * 2 + Vector3.up * 3).normalized;
-            _rigidbody.AddRelativeForce(dir* dashpower, ForceMode.Acceleration);
-            Debug.Log("Qinggong");
-        }
-
     }
-
-    public float dashpower;
 
     void UseQi()
     {
@@ -160,6 +166,11 @@ public class PlayerController3D : MonoBehaviour
             
         }
         
+    }
+
+    void Test() 
+    {
+        Debug.Log("Test");
     }
 }
 
