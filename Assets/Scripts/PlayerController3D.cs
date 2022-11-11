@@ -23,6 +23,7 @@ public class PlayerController3D : MonoBehaviour
 
     //Jump
     //[Range(5, 15)]
+    [Header("Jump")]
     [SerializeField] private float JumpVelocity = 7;
     private float coyoteJump = 0.2f;
     private float coyoteJumpTimer;
@@ -30,11 +31,16 @@ public class PlayerController3D : MonoBehaviour
     private float JumpBufferTimer;
 
     //QI
+    [Header("Qi")]
     private float QiValue = 10;
     [SerializeField]private float qiMoveMul = 1;
     [SerializeField]private float qiJumpMul = 1;
     private float QiMoveMul = 1.5f;
     private float QiJumpMul = 1.2f;
+
+    //Climb wall
+    [Header("ClimbWall")]
+    [SerializeField]private float climbVelocity = 4f;
 
     [SerializeField] private Transform GroundCheck;
     [SerializeField] private LayerMask GroundLayer;
@@ -100,20 +106,16 @@ public class PlayerController3D : MonoBehaviour
         Move(AxisX);
         Jump();
         UseQi();
+        WalkOnlWall(AxisX);
     }
 
     private void RayDetector()
     {
         rightRay = Physics.Raycast(transform.position, Vector3.right,out rightInfo, rayDis);
-        leftRay = Physics.Raycast(transform.position, Vector3.right, out leftInfo, rayDis);
-        upRay = Physics.Raycast(transform.position, Vector3.right, out upInfo, rayDis);
-        downRay = Physics.Raycast(transform.position, Vector3.right, out downInfo, rayDis);
+        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis);
+        upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis);
+        downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDis);
         Debug.DrawRay(transform.position, Vector3.right * rayDis, Color.red);
-
-        if ((rightRay || leftRay)&&( rightInfo.collider.tag == "Climbable" || leftInfo.collider.tag == "Climbable"))
-        {
-            Debug.Log("Can climb");
-        }
     }
 
     void Move(float inputX)
@@ -168,9 +170,27 @@ public class PlayerController3D : MonoBehaviour
         
     }
 
-    void Test() 
+    private void WalkOnlWall(float inputX)
     {
-        Debug.Log("Test");
+        if (playerState == PLAYERSTATE.Qi && inputX != 0)
+        { 
+            if (leftInfo.collider != null && leftInfo.collider.tag == "Climbable")
+            {
+                _rigidbody.velocity = new Vector3(0, climbVelocity * Time.deltaTime, _rigidbody.velocity.z);
+                Debug.Log("“ı∞µµƒ◊Û±ﬂ≈¿––");
+            }
+            else if (rightInfo.collider != null && rightInfo.collider.tag == "Climbable")
+            {
+                _rigidbody.velocity = new Vector3(0, climbVelocity * Time.deltaTime, _rigidbody.velocity.z);
+                Debug.Log("“ı∞µµƒ”“±ﬂ≈¿––");
+            }
+        
+        }
+    }
+
+    private void JieLi()
+    { 
+    
     }
 }
 
