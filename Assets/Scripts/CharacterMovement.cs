@@ -16,6 +16,10 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] private float apexPoint;
     [SerializeField] private float jumpApexThreshold = 10f;
     [SerializeField] private float jumpEarlyMul = 3f;
+    private float coyoteJump = 0.2f;
+    private float coyoteJumpTimer;
+    private float jumpInputBuffer = 0.2f;
+    private float jumpInputBufferTimer;
     private bool jumpInputDown;
     private bool jumpInputUp;
 
@@ -173,6 +177,7 @@ public class CharacterMovement : MonoBehaviour
         leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis);
         upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis);
         downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDis);
+        Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDis, Color.red, 1);
     }
 
     private bool GroundCheck()

@@ -1368,6 +1368,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1256103827, guid: f9f13c47e0945fd4f9729406da7e72c6, type: 3}
+      propertyPath: rayDis
+      value: 0.55
+      objectReference: {fileID: 0}
     - target: {fileID: 1832704420, guid: f9f13c47e0945fd4f9729406da7e72c6, type: 3}
       propertyPath: m_Time
       value: 0.6
