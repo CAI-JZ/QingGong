@@ -49,7 +49,7 @@ public class PlayerController3D : MonoBehaviour
 
     private bool rightRay, leftRay, upRay, downRay;
     private RaycastHit rightInfo, leftInfo, upInfo, downInfo;
-    [SerializeField]private float rayDis = 1f;
+    [SerializeField]private float rayDis = 0.5f;
     
 
     private void Awake()
