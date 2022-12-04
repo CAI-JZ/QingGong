@@ -8,27 +8,27 @@ public class CharacterMovement : MonoBehaviour
     [Header("BASIC DATA")]
     [SerializeField]
     Vector3 Velocity;
-    float moveDir;
+    [SerializeField]float moveDir;
 
     [Header("JUMP")]
     //Character Basic data
-    [SerializeField] private float jumpHight = 30f;
-    [SerializeField] private float apexPoint;
+    [SerializeField] private float jumpHight = 30f;    
     [SerializeField] private float jumpApexThreshold = 10f;
     [SerializeField] private float jumpEarlyMul = 3f;
-    private float coyoteJump = 0.2f;
-    [SerializeField]private float coyoteJumpTimer;
-    private float jumpInputBuffer = 0.2f;
-    [SerializeField]private float jumpInputBufferTimer;
+    [SerializeField]private float coyoteJump = 0.2f;
+    [SerializeField]private float jumpInputBuffer = 0.2f;
+    private float coyoteJumpTimer;
+    private float jumpInputBufferTimer;
     private bool jumpInputDown;
     private bool jumpInputUp;
+    private float apexPoint;
 
-    //Gravity
-    public float fallGravity;
+    [Header("GRAVITY")]
     [SerializeField]private float gravityClamp = -30f;
     [SerializeField]private float minFallGravity = 80f;
     [SerializeField]private float maxFallGraviyt = 120f;
     private bool isJumpEarlyUp;
+    public float fallGravity;
 
     //Moves
     [Header("MOVE")]
@@ -46,8 +46,6 @@ public class CharacterMovement : MonoBehaviour
     [Range(0, 1)]
     
     //GroundCheck
-    [SerializeField]
-    private Transform groundCheck;
     [SerializeField]
     private LayerMask groundLayer;
     [SerializeField] private bool isGround;
@@ -124,7 +122,7 @@ public class CharacterMovement : MonoBehaviour
 
     private void Jump()
     {
-        if (jumpInputDown && coyoteJumpTimer>0)
+        if (jumpInputBufferTimer>0 && coyoteJumpTimer>0)
         {
             Velocity.y = jumpHight;
             jumpInputBufferTimer = 0;
@@ -132,6 +130,32 @@ public class CharacterMovement : MonoBehaviour
         if (!downRay && jumpInputUp && Velocity.y > 0)
         {
             isJumpEarlyUp = true;
+        }
+    }
+
+    private void JumpOptimation()
+    {
+        // coyote Jump
+        if (downRay)
+        {
+            coyoteJumpTimer = coyoteJump;
+        }
+        else
+        {
+            coyoteJumpTimer -= Time.deltaTime;
+        }
+
+        //Inputbuffer
+        if (jumpInputDown)
+        {
+            jumpInputBufferTimer = jumpInputBuffer;
+        }
+        else
+        {
+            jumpInputBufferTimer -= Time.deltaTime;
+            //jumpInputBufferTimer = Mathf.Clamp(jumpInputBufferTimer, 0, jumpInputBuffer);
+            if (jumpInputBufferTimer < 0) jumpInputBufferTimer = 0;            
+            
         }
     }
 
@@ -145,8 +169,8 @@ public class CharacterMovement : MonoBehaviour
             { 
                 Velocity.y = 0;
                 transform.position = downInfo.point+ new Vector3(0,0.5f,0);
-                Debug.Log("self: " + transform.position);
-                Debug.Log("Hit point: " + downInfo.point);
+                // Debug.Log("self: " + transform.position);
+                //Debug.Log("Hit point: " + downInfo.point);
                 isJumpEarlyUp = false;
             }
             return;
@@ -173,29 +197,7 @@ public class CharacterMovement : MonoBehaviour
 
     }
 
-    private void JumpOptimation()
-    {
-        // coyote Jump
-        if (downRay)
-        {
-            coyoteJumpTimer = coyoteJump;
-        }
-        else
-        {
-            coyoteJumpTimer -= Time.deltaTime;
-        }
-
-        //Inputbuffer
-        if (jumpInputDown)
-        {
-            jumpInputBuffer = jumpInputBufferTimer;
-        }
-        else
-        {
-            jumpInputBufferTimer -= Time.deltaTime;
-            jumpInputBufferTimer = Mathf.Clamp(jumpInputBufferTimer, 0, jumpInputBuffer);
-        }
-    }
+    
 
     public void InputDetector()
     {
@@ -207,10 +209,10 @@ public class CharacterMovement : MonoBehaviour
 
     private void RayDetector()
     {
-        rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis);
-        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis);
-        upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis);
-        downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDis);
+        rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis,(1<<10));
+        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, (1 << 10));
+        upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis, (1 << 10));
+        downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDis, (1 << 10));
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDis, Color.red, 1);
     }
 

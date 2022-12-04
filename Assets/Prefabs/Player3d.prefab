@@ -72,7 +72,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.41
+  m_Time: 0.6
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -112,7 +112,7 @@ TrailRenderer:
     colorGradient:
       serializedVersion: 2
       key0: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 1}
-      key1: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 1}
+      key1: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 0.75686276}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -139,7 +139,7 @@ TrailRenderer:
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
-    numCapVertices: 0
+    numCapVertices: 2
     alignment: 0
     textureMode: 0
     shadowBias: 0.5
@@ -228,36 +228,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &2728333891928454277
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2728333891928454278}
-  m_Layer: 0
-  m_Name: GroundCheck
-  m_TagString: Untagged
-  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2728333891928454278
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2728333891928454277}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 2728333893366303803}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2728333893366303799
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,7 +258,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7811896565527427917}
-  - {fileID: 2728333891928454278}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -319,22 +288,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Velocity: {x: 0, y: 0, z: 0}
+  moveDir: 0
   jumpHight: 30
-  apexPoint: 0
   jumpApexThreshold: 10
-  fallGravity: 10
+  jumpEarlyMul: 3
+  coyoteJump: 0.1
+  jumpInputBuffer: 0.1
   gravityClamp: -30
   minFallGravity: 80
   maxFallGraviyt: 120
-  moveAcceleration: 90
-  deAcceleration: 120
-  moveClamp: 10
-  rayDis: 0.6
+  fallGravity: 10
+  moveAcceleration: 200
+  deAcceleration: 300
+  moveClamp: 8
+  rayDis: 0.55
   rightRay: 0
   leftRay: 0
   upRay: 0
   downRay: 0
-  groundCheck: {fileID: 2728333891928454278}
+  groundCheck: {fileID: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 1024
