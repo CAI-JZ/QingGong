@@ -17,9 +17,9 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] private float jumpApexThreshold = 10f;
     [SerializeField] private float jumpEarlyMul = 3f;
     private float coyoteJump = 0.2f;
-    private float coyoteJumpTimer;
+    [SerializeField]private float coyoteJumpTimer;
     private float jumpInputBuffer = 0.2f;
-    private float jumpInputBufferTimer;
+    [SerializeField]private float jumpInputBufferTimer;
     private bool jumpInputDown;
     private bool jumpInputUp;
 
@@ -59,7 +59,7 @@ public class CharacterMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        CharacterMove();
+        
     }
 
     // Update is called once per frame
@@ -68,14 +68,20 @@ public class CharacterMovement : MonoBehaviour
         RayDetector();
         isGround = GroundCheck();
         InputDetector();
+        JumpOptimation();
 
         CalculateWalk();
         CalculateJumpApex();
         Gravity();
         Jump();
+        CharacterMove();
+
     }
 
-
+    private void LateUpdate()
+    {
+        
+    }
 
 
     private void CalculateWalk()
@@ -118,9 +124,10 @@ public class CharacterMovement : MonoBehaviour
 
     private void Jump()
     {
-        if (jumpInputDown)
+        if (jumpInputDown && coyoteJumpTimer>0)
         {
             Velocity.y = jumpHight;
+            jumpInputBufferTimer = 0;
         }
         if (!downRay && jumpInputUp && Velocity.y > 0)
         {
@@ -134,9 +141,12 @@ public class CharacterMovement : MonoBehaviour
 
         if (isGround)
         {
-            if (Velocity.y < 0)
+            if (Velocity.y < 0 && downInfo.collider.tag == "Ground")
             { 
                 Velocity.y = 0;
+                transform.position = downInfo.point+ new Vector3(0,0.5f,0);
+                Debug.Log("self: " + transform.position);
+                Debug.Log("Hit point: " + downInfo.point);
                 isJumpEarlyUp = false;
             }
             return;
@@ -161,6 +171,30 @@ public class CharacterMovement : MonoBehaviour
             Velocity.y = gravityClamp;
         }
 
+    }
+
+    private void JumpOptimation()
+    {
+        // coyote Jump
+        if (downRay)
+        {
+            coyoteJumpTimer = coyoteJump;
+        }
+        else
+        {
+            coyoteJumpTimer -= Time.deltaTime;
+        }
+
+        //Inputbuffer
+        if (jumpInputDown)
+        {
+            jumpInputBuffer = jumpInputBufferTimer;
+        }
+        else
+        {
+            jumpInputBufferTimer -= Time.deltaTime;
+            jumpInputBufferTimer = Mathf.Clamp(jumpInputBufferTimer, 0, jumpInputBuffer);
+        }
     }
 
     public void InputDetector()

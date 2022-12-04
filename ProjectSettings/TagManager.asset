@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Climbable
+  - Ground
   layers:
   - Default
   - TransparentFX
