@@ -241,7 +241,7 @@ GameObject:
   - component: {fileID: 1256103827}
   m_Layer: 0
   m_Name: Player3d
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -292,8 +292,9 @@ MonoBehaviour:
   jumpHight: 30
   jumpApexThreshold: 10
   jumpEarlyMul: 3
-  coyoteJump: 0.1
+  coyoteJump: 0.15
   jumpInputBuffer: 0.1
+  apexPoint: 0
   gravityClamp: -30
   minFallGravity: 80
   maxFallGraviyt: 120
@@ -306,7 +307,6 @@ MonoBehaviour:
   leftRay: 0
   upRay: 0
   downRay: 0
-  groundCheck: {fileID: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 1024

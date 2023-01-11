@@ -15,12 +15,13 @@ public class QiBar : MonoBehaviour
     [SerializeField] private float insdeLerpSpeed;
     [SerializeField] private float insideWaitTime = 1f;
     private float insideLerpTimer;
-
+    private CanvasGroup canvasGroup;
 
     private void Awake()
     {
         currentQi = maxQi;
         insideQi = maxQi;
+        canvasGroup = GetComponent<CanvasGroup>();
     }
 
     private void Update()
@@ -28,10 +29,17 @@ public class QiBar : MonoBehaviour
         frontBar.fillAmount = currentQi / maxQi;
         insideBar.fillAmount = insideQi / maxQi;
 
-        if (Input.GetKeyDown(KeyCode.L))
+        if (Input.GetKeyDown(KeyCode.E))
         {
+            canvasGroup.alpha = 1;
             DecreaseQi(20);
         }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            canvasGroup.alpha = 1;
+            IncreaseQi();
+        }
+
         if (insideQi > currentQi)
         {
             insideLerpTimer -= Time.deltaTime;
@@ -40,12 +48,17 @@ public class QiBar : MonoBehaviour
                 insideQi = Mathf.Lerp(insideQi, currentQi, insdeLerpSpeed);
             }
         }
-
     }
 
-    private void FixedUpdate()
+    private IEnumerator Disappear()
     {
-        
+        yield return new WaitForSeconds(2f);
+        while (canvasGroup.alpha > 0)
+        {
+            canvasGroup.alpha -= Time.deltaTime;
+            //canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, 5 * Time.deltaTime);
+        }
+        //canvasGroup.alpha = 0;
     }
 
     public void DecreaseQi(float cost)
@@ -60,5 +73,13 @@ public class QiBar : MonoBehaviour
             currentQi = 0;
         }
         insideLerpTimer = insideWaitTime;
+        StopAllCoroutines();
+        StartCoroutine("Disappear");
+    }
+
+    public void IncreaseQi()
+    {
+        currentQi += 20f;
+        insideQi = currentQi;
     }
 }
