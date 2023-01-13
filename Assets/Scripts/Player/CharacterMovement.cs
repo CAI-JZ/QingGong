@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class CharacterMovement : MonoBehaviour
 {
     //Move
     [Header("BASIC DATA")]
-    [SerializeField]
-    Vector3 Velocity;
+    [SerializeField] Vector3 Velocity;
     [SerializeField] float moveDir;
     private bool isControllable;
 
@@ -40,6 +40,7 @@ public class CharacterMovement : MonoBehaviour
     [Header("RAY")]
     //RayCast
     [SerializeField] private float rayDis = 0.5f;
+    [SerializeField] private float rayDisDown = 0.7f;
     [SerializeField] private bool rightRay, leftRay, upRay, downRay;
     private RaycastHit rightInfo, leftInfo, upInfo, downInfo;
 
@@ -50,25 +51,28 @@ public class CharacterMovement : MonoBehaviour
     private bool isQi;
     private bool useQi;
     [SerializeField] private float qiGraviytMul;
-    private QiValue qiValue;
+    private QiValue _qiValue;
+    [SerializeField] private bool canRecharge;
+    //public bool rechargeable { get { return canRecharge; } set { canRecharge = value; }}
+    [SerializeField] private BorrowableType currentRechargeType = BorrowableType.Defult;
 
     [Header("OTHER")]
     //GroundCheck
-    [SerializeField]
-    private LayerMask groundLayer;
+    [SerializeField] private LayerMask groundLayer;
     //[SerializeField] private bool isGround;
 
     private void Awake()
     {
         isControllable = true;
-        qiValue = GetComponent<QiValue>();
+        _qiValue = GetComponent<QiValue>();
     }
 
     // Update is called once per frame
     void Update()
     {
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.R)) qiValue.IncreaseQi(1);
+        if (Input.GetKeyDown(KeyCode.R)) _qiValue.IncreaseQi(1);
+        if (Input.GetKeyDown(KeyCode.F)) BorrowPower();
 #endif
         RayDetector();
         InputDetector();
@@ -217,13 +221,13 @@ public class CharacterMovement : MonoBehaviour
         rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis, (1 << 10));
         leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, (1 << 10));
         upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis, (1 << 10));
-        downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDis, (1 << 10));
+        downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDisDown, (1 << 10));
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDis, Color.red, 1);
     }
 
     private void UseQinggong()
     {
-        if (!downRay && useQi && qiValue.DecreaseQi(1))
+        if (!downRay && useQi && _qiValue.DecreaseQi(1))
         {
             StopCoroutine("Qinggong");
             StartCoroutine("Qinggong");
@@ -238,7 +242,6 @@ public class CharacterMovement : MonoBehaviour
             //}
 
             // Velocity.x = Mathf.Lerp(Velocity.sx, 0, 0.2f * Time.deltaTime);
-
         }
     }
 
@@ -259,7 +262,22 @@ public class CharacterMovement : MonoBehaviour
         }
         Velocity = Vector3.zero;
         isControllable = true;
-        
+    }
+
+    public void UpdateRechargeInfo(bool isRecharge, BorrowableType itemType)
+    {
+        currentRechargeType = itemType;
+        canRecharge = isRecharge;
+    }
+
+    public void BorrowPower()
+    {
+        if (canRecharge)
+        {
+            _qiValue.IncreaseQi(1);
+            StopCoroutine("Qinggong");
+            StartCoroutine("Qinggong");
+        }
     }
 }
 

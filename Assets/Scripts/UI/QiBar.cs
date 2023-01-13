@@ -69,13 +69,13 @@ public class QiBar : MonoBehaviour
 
     private IEnumerator Disappear()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(2);
         while (canvasGroup.alpha > 0)
         {
-            canvasGroup.alpha -= Time.deltaTime;
-            //canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, 0, 5 * Time.deltaTime);
+            canvasGroup.alpha -= Time.deltaTime*2;
+            yield return new WaitForFixedUpdate();
         }
-        //canvasGroup.alpha = 0;
+        canvasGroup.alpha = 0;
     }
 
     public void DecreaseQi(int cost)
