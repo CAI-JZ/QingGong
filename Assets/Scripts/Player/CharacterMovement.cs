@@ -47,10 +47,10 @@ public class CharacterMovement : MonoBehaviour
     [Header("QI")]
     //qinggong
     [SerializeField] public float qiJumpPower = 10;
-    private float qiValue = 100;
     private bool isQi;
     private bool useQi;
     [SerializeField] private float qiGraviytMul;
+    private QiValue qiValue;
 
     [Header("OTHER")]
     //GroundCheck
@@ -61,11 +61,15 @@ public class CharacterMovement : MonoBehaviour
     private void Awake()
     {
         isControllable = true;
+        qiValue = GetComponent<QiValue>();
     }
 
     // Update is called once per frame
     void Update()
     {
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.R)) qiValue.IncreaseQi(1);
+#endif
         RayDetector();
         InputDetector();
 
@@ -219,7 +223,7 @@ public class CharacterMovement : MonoBehaviour
 
     private void UseQinggong()
     {
-        if (!downRay && useQi)
+        if (!downRay && useQi && qiValue.DecreaseQi(1))
         {
             StopCoroutine("Qinggong");
             StartCoroutine("Qinggong");

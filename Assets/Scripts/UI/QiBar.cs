@@ -6,10 +6,11 @@ using UnityEngine.UI;
 public class QiBar : MonoBehaviour
 {
     public Image frontBar, insideBar;
+    private QiValue Qi;
 
-    private float maxQi = 100;
-    [SerializeField]private float currentQi;
-    [SerializeField]private float insideQi;
+    private int maxQi;
+    [SerializeField] private int currentQi;
+    [SerializeField] private float insideQi;
 
     [SerializeField] private float frontLerpSpeed;
     [SerializeField] private float insdeLerpSpeed;
@@ -17,29 +18,45 @@ public class QiBar : MonoBehaviour
     private float insideLerpTimer;
     private CanvasGroup canvasGroup;
 
-    private void Awake()
+    private void Start()
     {
+        Qi = GameObject.FindGameObjectWithTag("Player").GetComponent<QiValue>();
+        if (Qi != null)
+        {
+            InitializedData();
+        }
+
+        Qi.eventDecreaseQi += DecreaseQi;
+        Qi.eventIncreaseQi += IncreaseQi;
+        Qi.eventQiUpgrade += QiUpgrade;
+
+    }
+
+    private void InitializedData()
+    {
+        canvasGroup = GetComponent<CanvasGroup>();
+        maxQi = Qi.qiValue;
         currentQi = maxQi;
         insideQi = maxQi;
-        canvasGroup = GetComponent<CanvasGroup>();
     }
 
     private void Update()
     {
-        frontBar.fillAmount = currentQi / maxQi;
+        frontBar.fillAmount = (float)currentQi / maxQi;
         insideBar.fillAmount = insideQi / maxQi;
+        InsideLerp();
 
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.E))
         {
             canvasGroup.alpha = 1;
-            DecreaseQi(20);
         }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            canvasGroup.alpha = 1;
-            IncreaseQi();
-        }
+#endif
+        
+    }
 
+    private void InsideLerp()
+    {
         if (insideQi > currentQi)
         {
             insideLerpTimer -= Time.deltaTime;
@@ -61,25 +78,37 @@ public class QiBar : MonoBehaviour
         //canvasGroup.alpha = 0;
     }
 
-    public void DecreaseQi(float cost)
+    public void DecreaseQi(int cost)
     {
-        float tempQi = currentQi - cost;
-        if (tempQi > 0)
+        Debug.Log("事件触发");
+        int temp = currentQi - cost;
+        if(temp<0)
         {
-            currentQi = tempQi;
+            return;   
         }
-        else
-        {
-            currentQi = 0;
-        }
+        currentQi = temp;
+        canvasGroup.alpha = 1;
+
         insideLerpTimer = insideWaitTime;
         StopAllCoroutines();
         StartCoroutine("Disappear");
     }
 
-    public void IncreaseQi()
+    public void IncreaseQi(int value)
     {
-        currentQi += 20f;
+        int temp = currentQi + value;
+        if (temp > maxQi)
+        {
+            Debug.Log("不能再增加了");
+            return;
+        }
+        canvasGroup.alpha = 1;
+        currentQi = temp;
         insideQi = currentQi;
+    }
+
+    public void QiUpgrade(int newLevel)
+    { 
+    
     }
 }
