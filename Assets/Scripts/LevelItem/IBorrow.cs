@@ -4,5 +4,6 @@ using UnityEngine;
 
 public interface IBorrow
 {
-    public void RechargeQi();
+    public void RechargeQi(Vector3 velocity);
+    public BorrowableType GetBorrowableType();
 }

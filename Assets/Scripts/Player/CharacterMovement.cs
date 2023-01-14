@@ -84,7 +84,6 @@ public class CharacterMovement : MonoBehaviour
         Jump();
         UseQinggong();
         CharacterMove();
-
     }
 
     private void CharacterMove()
@@ -262,6 +261,15 @@ public class CharacterMovement : MonoBehaviour
         }
         Velocity = Vector3.zero;
         isControllable = true;
+    }
+
+    private void CheckRechargeableItem(GameObject rechargeable)
+    {
+        if (rechargeable.TryGetComponent(out IBorrow borrowable))
+        {
+            borrowable.RechargeQi(Velocity);
+            currentRechargeType = borrowable.GetBorrowableType();
+        }
     }
 
     public void UpdateRechargeInfo(bool isRecharge, BorrowableType itemType)
