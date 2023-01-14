@@ -80,7 +80,6 @@ public class QiBar : MonoBehaviour
 
     public void DecreaseQi(int cost)
     {
-        Debug.Log("ÊÂ¼þ´¥·¢");
         int temp = currentQi - cost;
         if(temp<0)
         {

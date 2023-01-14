@@ -1,25 +1,25 @@
 using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
-public class Platform :BorrowableBase
+public class Platform : MonoBehaviour,IBorrow
 {
+    [SerializeField] protected int qiRecharge;
+    [SerializeField] protected BorrowableType type = BorrowableType.Defult;
 
-    private void Awake()
+    public BorrowableType GetBorrowableType()
     {
-        
+        return type;
     }
 
-    protected override void OnTriggerEnter(Collider other)
+    public void RechargeQi(Vector3 velocity)
     {
-        Debug.Log("我应该在进入前出现");
-        base.OnTriggerEnter(other);
-        Debug.Log("进入了，确信");
+
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        
+        Debug.Log("砰");
         Collider target = collision.collider;
         if (target.tag == "Player")
         {

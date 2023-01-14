@@ -6,7 +6,8 @@ public class QiValue : MonoBehaviour
     [SerializeField]
     private int maxQiValue;
     public int qiValue => maxQiValue;
-    [SerializeField] int currentQiValue;
+    [SerializeField] private int currentQiValue;
+    [SerializeField] private float continDeMul;
 
     public event Action<int> eventDecreaseQi;
     public event Action<int> eventIncreaseQi;
@@ -19,13 +20,9 @@ public class QiValue : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKey(KeyCode.Q))
         {
-            IncreaseQi(1);
-        }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            IncreaseQi(3);
+            ContinDecreaseQi();
         }
     }
 
@@ -39,6 +36,18 @@ public class QiValue : MonoBehaviour
         }
         currentQiValue = targetValue;
         eventDecreaseQi?.Invoke(cost);
+        return true;
+    }
+
+    //´ýÐÞ¸Ä
+    public bool ContinDecreaseQi()
+    {
+        float targetValue = currentQiValue - Time.deltaTime * continDeMul;
+        if (targetValue < 0)
+        {
+            return false;
+        }
+
         return true;
     }
 

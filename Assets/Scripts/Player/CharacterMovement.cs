@@ -45,16 +45,18 @@ public class CharacterMovement : MonoBehaviour
     private RaycastHit rightInfo, leftInfo, upInfo, downInfo;
 
 
+
     [Header("QI")]
     //qinggong
-    [SerializeField] public float qiJumpPower = 10;
+    [SerializeField] public float qiJumpPower = 40;
     private bool isQi;
     private bool useQi;
     [SerializeField] private float qiGraviytMul;
     private QiValue _qiValue;
     [SerializeField] private bool canRecharge;
-    //public bool rechargeable { get { return canRecharge; } set { canRecharge = value; }}
     [SerializeField] private BorrowableType currentRechargeType = BorrowableType.Defult;
+    [SerializeField] private float rechargeTime;
+    private float rechargeTimer;
 
     [Header("OTHER")]
     //GroundCheck
@@ -70,12 +72,15 @@ public class CharacterMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-#if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.R)) _qiValue.IncreaseQi(1);
-        if (Input.GetKeyDown(KeyCode.F)) BorrowPower();
-#endif
+
         RayDetector();
         InputDetector();
+        CheckRechargeableItem();
+
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.R)) _qiValue.IncreaseQi(1);
+        if (Input.GetKeyDown(KeyCode.Mouse1)) BorrowPower();
+#endif
 
         JumpOptimation();
         CalculateWalk();
@@ -211,16 +216,16 @@ public class CharacterMovement : MonoBehaviour
         moveDir = PlayerInput._instance.moveDir;
         jumpInputDown = PlayerInput._instance.jumpBtnDown;
         jumpInputUp = PlayerInput._instance.jumpBtnUp;
-        isQi = Input.GetKey(KeyCode.LeftShift);
-        useQi = Input.GetKeyDown(KeyCode.LeftShift);
+        isQi = Input.GetKey(KeyCode.Mouse0);
+        useQi = Input.GetKeyDown(KeyCode.Mouse0);
     }
 
     private void RayDetector()
     {
-        rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis, (1 << 10));
-        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, (1 << 10));
+        rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis, (1 << 10 | 1 << 6));
+        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, (1 << 10 | 1 << 6));
         upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis, (1 << 10));
-        downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDisDown, (1 << 10));
+        downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDisDown, (1 << 10 | 1 << 6));
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDis, Color.red, 1);
     }
 
@@ -247,7 +252,6 @@ public class CharacterMovement : MonoBehaviour
     //待优化
     IEnumerator Qinggong()
     {
-        Debug.Log("携程开始");
         float inputHori = moveDir;
         float inputVert = 1;
         Vector2 dashDir = new Vector2(moveDir, inputVert).normalized;
@@ -255,7 +259,7 @@ public class CharacterMovement : MonoBehaviour
         int i = 0;
         while (i < 9)
         {
-            Velocity = dashDir * 30;
+            Velocity = dashDir * qiJumpPower;
             i++;
             yield return new WaitForFixedUpdate();
         }
@@ -263,29 +267,61 @@ public class CharacterMovement : MonoBehaviour
         isControllable = true;
     }
 
-    private void CheckRechargeableItem(GameObject rechargeable)
+    private void BorrowPower()
     {
-        if (rechargeable.TryGetComponent(out IBorrow borrowable))
+        if (CheckRechargeableItem())
         {
-            borrowable.RechargeQi(Velocity);
-            currentRechargeType = borrowable.GetBorrowableType();
-        }
-    }
-
-    public void UpdateRechargeInfo(bool isRecharge, BorrowableType itemType)
-    {
-        currentRechargeType = itemType;
-        canRecharge = isRecharge;
-    }
-
-    public void BorrowPower()
-    {
-        if (canRecharge)
-        {
+            Debug.Log("可以借力");
             _qiValue.IncreaseQi(1);
             StopCoroutine("Qinggong");
             StartCoroutine("Qinggong");
+            }
+        else
+        {
+            Debug.Log("不可以借力");
         }
+    }
+
+    private bool CheckRechargeableItem()
+    {
+        if (downInfo.collider != null && downInfo.collider.tag != "Ground")
+        {
+            downInfo.collider.gameObject.TryGetComponent(out IBorrow borrowable);
+            GetItemInfo(borrowable);
+        }
+        else if (rightInfo.collider != null && rightInfo.collider.tag != "Ground")
+        {
+            rightInfo.collider.gameObject.TryGetComponent(out IBorrow borrowable);
+            GetItemInfo(borrowable);
+        }
+        else if (leftInfo.collider != null && leftInfo.collider.tag != "Ground")
+        {
+            leftInfo.collider.gameObject.TryGetComponent(out IBorrow borrowable);
+            GetItemInfo(borrowable);
+        }
+
+        return canRecharge;
+    }
+
+    private void GetItemInfo (IBorrow bor)
+    {
+        currentRechargeType = bor.GetBorrowableType();
+        StopCoroutine("CanRechargeWindow");
+        StartCoroutine("CanRechargeWindow");
+    }
+
+    IEnumerator CanRechargeWindow()
+    {
+        canRecharge = true;
+        rechargeTimer = rechargeTime;
+        while (rechargeTimer > 0)
+        {
+            rechargeTimer -= Time.deltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+        rechargeTimer = 0f;
+        canRecharge = false;
+        currentRechargeType = BorrowableType.Defult;
     }
 }
 
