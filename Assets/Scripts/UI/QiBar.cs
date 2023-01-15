@@ -8,8 +8,8 @@ public class QiBar : MonoBehaviour
     public Image frontBar, insideBar;
     private QiValue Qi;
 
-    private int maxQi;
-    [SerializeField] private int currentQi;
+    private float maxQi;
+    [SerializeField] private float currentQi;
     [SerializeField] private float insideQi;
 
     [SerializeField] private float frontLerpSpeed;
@@ -42,7 +42,7 @@ public class QiBar : MonoBehaviour
 
     private void Update()
     {
-        frontBar.fillAmount = (float)currentQi / maxQi;
+        frontBar.fillAmount = currentQi / maxQi;
         insideBar.fillAmount = insideQi / maxQi;
         InsideLerp();
 
@@ -78,9 +78,9 @@ public class QiBar : MonoBehaviour
         canvasGroup.alpha = 0;
     }
 
-    public void DecreaseQi(int cost)
+    public void DecreaseQi(float cost)
     {
-        int temp = currentQi - cost;
+        float temp = currentQi - cost;
         if(temp<0)
         {
             return;   
@@ -93,9 +93,9 @@ public class QiBar : MonoBehaviour
         StartCoroutine("Disappear");
     }
 
-    public void IncreaseQi(int value)
+    public void IncreaseQi(float value)
     {
-        int temp = currentQi + value;
+        float temp = currentQi + value;
         if (temp > maxQi)
         {
             Debug.Log("不能再增加了");

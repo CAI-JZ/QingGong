@@ -1,21 +1,22 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class QiValue : MonoBehaviour
 {
     [SerializeField]
-    private int maxQiValue;
-    public int qiValue => maxQiValue;
-    [SerializeField] private int currentQiValue;
+    private int qiLevel;
+    public float qiValue => qiLevel;
+    [SerializeField] private float currentQiValue;
     [SerializeField] private float continDeMul;
 
-    public event Action<int> eventDecreaseQi;
-    public event Action<int> eventIncreaseQi;
+    public event Action<float> eventDecreaseQi;
+    public event Action<float> eventIncreaseQi;
     public event Action<int> eventQiUpgrade;
 
     private void Awake()
     {
-        currentQiValue = maxQiValue;
+        currentQiValue = qiLevel;
     }
 
     private void Update()
@@ -24,11 +25,15 @@ public class QiValue : MonoBehaviour
         {
             ContinDecreaseQi();
         }
+        else if(Input.GetKey(KeyCode.E))
+        {
+            AutoRechargeQi();
+        }
     }
 
-    public bool DecreaseQi(int cost)
+    public bool DecreaseQi(float cost)
     {
-        int targetValue = currentQiValue - cost;
+        float targetValue = currentQiValue - cost;
         if (targetValue < 0)
         {
             Debug.Log("气力值已耗尽，无法使用");
@@ -47,14 +52,14 @@ public class QiValue : MonoBehaviour
         {
             return false;
         }
-
+        currentQiValue = targetValue;
         return true;
     }
 
-    public void IncreaseQi(int increase)
+    public void IncreaseQi(float increase)
     {
-        int targetValue = increase + currentQiValue;
-        if (targetValue > maxQiValue)
+        float targetValue = increase + currentQiValue;
+        if (targetValue > qiLevel)
         {
             Debug.Log("气力值已满，无需增加");
             return;
@@ -63,10 +68,34 @@ public class QiValue : MonoBehaviour
         eventIncreaseQi?.Invoke(increase);
     }
 
+    public void AutoRechargeQi()
+    {
+        if (currentQiValue > qiLevel)
+        {
+            currentQiValue = qiLevel;
+            return;
+        }
+        StopCoroutine("AutoRecharge");
+        StartCoroutine("AutoRecharge");
+    }
+
+    private IEnumerator AutoRecharge()
+    {
+        yield return new WaitForSeconds(1);
+        int qiGrade = (int)currentQiValue + 1;
+        while (currentQiValue < qiGrade)
+        {
+            currentQiValue += Time.deltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+        currentQiValue = qiGrade;
+    }
+
+
     public void QiUpgrade(int value)
     {
-        maxQiValue += value;
-        currentQiValue = maxQiValue;
-        eventQiUpgrade?.Invoke(maxQiValue);
+        qiLevel += value;
+        currentQiValue = qiLevel;
+        eventQiUpgrade?.Invoke(qiLevel);
     }
 }
