@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Test_ChinesePainting
+  m_Name: ChineseStyle_Tree
   m_Shader: {fileID: 4800000, guid: 7eb03316cc0eb0a469b4f6dc0c7285a7, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -20,11 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _InteriorNoise:
-        m_Texture: {fileID: 2800000, guid: eae7bcddc566bbe4b972f177b08b161e, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: e93d24f86bb1c954dacf0a0fe2007a40, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OutlineNoise:
@@ -32,22 +28,22 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Ramp:
-        m_Texture: {fileID: 2800000, guid: 09155c5c7aebad24da9cb7104be95c80, type: 3}
+        m_Texture: {fileID: 2800000, guid: 7a5493e0b56da554fb1a991cfb964fa3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _StrokeTex:
-        m_Texture: {fileID: 2800000, guid: 9b803bd54a0c1064c9f48be7eea9d9d6, type: 3}
-        m_Scale: {x: 9.02, y: 1}
+        m_Texture: {fileID: 2800000, guid: e93d24f86bb1c954dacf0a0fe2007a40, type: 3}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _InteriorNoiseLevel: 0.262
-    - _MaxOutlineZOffset: 0.298
-    - _Outline: 0.117
-    - _OutsideNoiseWidth: 1.178
-    - hstep: 0.838
-    - radius: 60
+    - _InteriorNoiseLevel: 0
+    - _MaxOutlineZOffset: 0
+    - _Outline: 0.06
+    - _OutsideNoiseWidth: 1
+    - hstep: 0.31
+    - radius: 19.6
     - resolution: 800
-    - vstep: 0.589
+    - vstep: 0.59
     m_Colors:
-    - _StrokeColor: {r: 0, g: 0, b: 0, a: 1}
+    - _StrokeColor: {r: 0.25162175, g: 0.46226418, b: 0.071956225, a: 1}
   m_BuildTextureStacks: []

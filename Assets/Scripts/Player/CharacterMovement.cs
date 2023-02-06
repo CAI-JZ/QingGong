@@ -72,7 +72,6 @@ public class CharacterMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         RayDetector();
         InputDetector();
         CheckRechargeableItem();
@@ -117,6 +116,12 @@ public class CharacterMovement : MonoBehaviour
                 Velocity.x = 0;
             }
         }
+    }
+
+    //add a function to chadnge the velocity
+    public void SmoothlyChangeVelocity()
+    { 
+    
     }
 
     private void CalculateJumpApex()
@@ -233,8 +238,8 @@ public class CharacterMovement : MonoBehaviour
     {
         if (!downRay && useQi && _qiValue.DecreaseQi(1))
         {
-            StopCoroutine("Qinggong");
-            StartCoroutine("Qinggong");
+            StopCoroutine(Qinggong());
+            StartCoroutine(Qinggong());
             //Velocity.y = qiJumpPower;
             //if (moveDir < 0)
             //{
@@ -282,6 +287,8 @@ public class CharacterMovement : MonoBehaviour
         }
     }
 
+
+    //ÒÆ¶¯µ½QinggongScript
     private bool CheckRechargeableItem()
     {
         if (downInfo.collider != null && downInfo.collider.tag != "Ground")
@@ -306,8 +313,8 @@ public class CharacterMovement : MonoBehaviour
     private void GetItemInfo (IBorrow bor)
     {
         currentRechargeType = bor.GetBorrowableType();
-        StopCoroutine("CanRechargeWindow");
-        StartCoroutine("CanRechargeWindow");
+        StopCoroutine(CanRechargeWindow());
+        StartCoroutine(CanRechargeWindow());
     }
 
     IEnumerator CanRechargeWindow()

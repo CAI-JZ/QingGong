@@ -6,6 +6,11 @@ public class PlayerInput : MonoBehaviour
 {
     public static PlayerInput _instance { get; private set; }
 
+    //Input keycode
+    [Header("Input Keycode")]
+    public KeyCode jumpKey = KeyCode.Escape;
+    public KeyCode useQiKey;
+
     //PlayerInput
     private float _horizontalInput;
     private bool _jumpInputDown;
@@ -29,7 +34,10 @@ public class PlayerInput : MonoBehaviour
     void Update()
     {
         _horizontalInput = Input.GetAxis("Horizontal");
+        //_jumpInputDown = Input.GetKeyDown(jumpKey);
+        //_jumpInputUp = Input.GetKeyUp(jumpKey);
         _jumpInputDown = Input.GetButtonDown("Jump");
         _jumpInputUp = Input.GetButtonUp("Jump");
+
     }
 }

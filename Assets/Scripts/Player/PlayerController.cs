@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     public static PlayerController _instance {get ; private set;}
 
+    public float qiValue;
 
 
 
