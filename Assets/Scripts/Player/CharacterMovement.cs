@@ -2,14 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
+[RequireComponent(typeof(CharacterData))]
 public class CharacterMovement : MonoBehaviour
 {
     //Move
     [Header("BASIC DATA")]
     [SerializeField] Vector3 Velocity;
+    [SerializeField] Vector3 moveDirection; //用来替代velocity，是一个单位向量，用来表示从碰撞获得的移动方向。
     [SerializeField] float moveDir;
     private bool isControllable;
+    CharacterData charData;
 
     [Header("JUMP")]
     //Character Basic data
@@ -44,8 +46,6 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] private bool rightRay, leftRay, upRay, downRay;
     private RaycastHit rightInfo, leftInfo, upInfo, downInfo;
 
-
-
     [Header("QI")]
     //qinggong
     [SerializeField] public float qiJumpPower = 40;
@@ -67,6 +67,7 @@ public class CharacterMovement : MonoBehaviour
     {
         isControllable = true;
         _qiValue = GetComponent<QiValue>();
+        charData = GetComponent<CharacterData>();
     }
 
     // Update is called once per frame
@@ -74,7 +75,7 @@ public class CharacterMovement : MonoBehaviour
     {
         RayDetector();
         InputDetector();
-        CheckRechargeableItem();
+        //CheckRechargeableItem();
 
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.R)) _qiValue.IncreaseQi(1);
@@ -82,16 +83,19 @@ public class CharacterMovement : MonoBehaviour
 #endif
 
         JumpOptimation();
-        CalculateWalk();
+        //CalculateWalk();
         CalculateJumpApex();
         Gravity();
         Jump();
-        UseQinggong();
+        WallWalk();
+        //UseQinggong();
+
         CharacterMove();
     }
 
     private void CharacterMove()
     {
+        Velocity.x = charData.moveSpeed * moveDir;
         transform.position += Velocity * Time.deltaTime;
     }
 
@@ -120,8 +124,8 @@ public class CharacterMovement : MonoBehaviour
 
     //add a function to chadnge the velocity
     public void SmoothlyChangeVelocity()
-    { 
-    
+    {
+
     }
 
     private void CalculateJumpApex()
@@ -216,6 +220,27 @@ public class CharacterMovement : MonoBehaviour
         }
     }
 
+    private void WallWalk()
+    {
+        if (rightRay || leftRay)
+        {
+            
+            Vector3 wallNormal = rightRay ? rightInfo.normal : leftInfo.normal;
+            Vector3 wallForward = (Vector3.Cross(wallNormal, Vector3.forward)).normalized;
+            Debug.DrawLine(transform.position, transform.position + wallForward,Color.green);
+            Debug.DrawLine(transform.position, transform.position + Vector3.right, Color.blue);
+            Debug.DrawLine(transform.position, transform.position + Vector3.forward*2, Color.black);
+            Debug.DrawLine(transform.position, transform.position + wallNormal * 2, Color.red);
+            float angle = Vector3.Dot(wallForward, Vector3.right);
+            Debug.Log(angle);
+            if (angle >= -0.01f)
+            { 
+                Velocity = new Vector3 (wallForward.x, wallForward.y, Velocity.z) * 10 * moveDir;
+            }
+        }
+    }
+
+
     public void InputDetector()
     {
         moveDir = PlayerInput._instance.moveDir;
@@ -227,12 +252,14 @@ public class CharacterMovement : MonoBehaviour
 
     private void RayDetector()
     {
-        rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis, (1 << 10 | 1 << 6));
-        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, (1 << 10 | 1 << 6));
+        rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis, ( 1 << 6));
+        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, ( 1 << 6));
         upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis, (1 << 10));
         downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDisDown, (1 << 10 | 1 << 6));
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDis, Color.red, 1);
     }
+
+
 
     private void UseQinggong()
     {
