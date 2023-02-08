@@ -240,6 +240,7 @@ GameObject:
   - component: {fileID: 2728333893366303801}
   - component: {fileID: 1256103827}
   - component: {fileID: 1269409019}
+  - component: {fileID: 1902904683}
   m_Layer: 0
   m_Name: Player3d
   m_TagString: Player
@@ -289,6 +290,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Velocity: {x: 0, y: 0, z: 0}
+  moveDirection: {x: 0, y: 0, z: 0}
   moveDir: 0
   jumpHight: 30
   jumpApexThreshold: 10
@@ -304,12 +306,16 @@ MonoBehaviour:
   deAcceleration: 300
   moveClamp: 8
   rayDis: 0.55
+  rayDisDown: 0.7
   rightRay: 0
   leftRay: 0
   upRay: 0
   downRay: 0
   qiJumpPower: 50
   qiGraviytMul: 0.2
+  canRecharge: 0
+  currentRechargeType: 0
+  rechargeTime: 0.1
   groundLayer:
     serializedVersion: 2
     m_Bits: 1024
@@ -325,8 +331,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10946d847cffb2844ba87e4bf9e8fc53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxQiValue: 3
+  qiLevel: 3
   currentQiValue: 0
+  continDeMul: 0.5
+--- !u!114 &1902904683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2728333893366303799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72f168d71a1ee14bafcc4486232dad0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshRender: {fileID: 0}
 --- !u!1 &4256788515788192582
 GameObject:
   m_ObjectHideFlags: 0

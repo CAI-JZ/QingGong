@@ -10,9 +10,9 @@ public class CharacterData : MonoBehaviour
 
     //Move
     [Header("Move")]
-    [SerializeField]private float moveAcceleration = 50f;
-    [SerializeField]private float deAcceleration = 50f;
-    [SerializeField]private float moveClamp = 13f;
+    [SerializeField]private float moveAcceleration;
+    [SerializeField]private float deAcceleration;
+    [SerializeField]private float moveClamp;
 
     private void Update()
     {

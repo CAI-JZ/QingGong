@@ -18,7 +18,7 @@ public class Idle : BaseState
     {
         base.Enter();
         horizontalInput = 0;  
-        _movementSM.meshRender.material.color= Color.black;
+        _movementSM.meshRender.material.color= new Color(0.3f,0.5f,0.6f);
         
     }
 

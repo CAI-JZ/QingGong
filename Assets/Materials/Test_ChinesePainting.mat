@@ -42,12 +42,12 @@ Material:
     m_Floats:
     - _InteriorNoiseLevel: 0.262
     - _MaxOutlineZOffset: 0.298
-    - _Outline: 0.117
+    - _Outline: 0.39
     - _OutsideNoiseWidth: 1.178
     - hstep: 0.838
     - radius: 60
     - resolution: 800
     - vstep: 0.589
     m_Colors:
-    - _StrokeColor: {r: 0, g: 0, b: 0, a: 1}
+    - _StrokeColor: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 1}
   m_BuildTextureStacks: []
