@@ -11,6 +11,7 @@ public class StateMachine : MonoBehaviour
     [SerializeField] Transform groundCheck;
     [SerializeField] LayerMask gourndLayer;
     public float moveDir;
+    public SpriteRenderer render;
 
     [SerializeField]private bool isGrounded;
     private bool isJumpPressed;
@@ -36,7 +37,7 @@ public class StateMachine : MonoBehaviour
     {
         CheckPlayerInput();
         isGrounded = Physics.CheckSphere(groundCheck.position, 0.1f, gourndLayer);
-        _currentState.UpdateState();
+        _currentState.UpdateStates();
         
 
        

@@ -1,10 +1,15 @@
 public class JumpState : BaseState
 {
-    public JumpState(StateMachine currentContext, StateFactory stateFactory) : base(currentContext, stateFactory,"Jump") { }
+    public JumpState(StateMachine currentContext, StateFactory stateFactory) : base(currentContext, stateFactory,"Jump") 
+    {
+        isRootState = true;
+        InitializeSubState();
+    }
 
 
     public override void Enter()
     {
+        
         HandleJump();
     }
 
@@ -23,7 +28,14 @@ public class JumpState : BaseState
 
     public override void InitializeSubState()
     {
-       
+        if (_ctx.moveDir == 0)
+        {
+            SetSubState(_factory.Idle());
+        }
+        else
+        {
+            SetSubState(_factory.Run());
+        }
     }
 
     public override void CheckSwitchState()

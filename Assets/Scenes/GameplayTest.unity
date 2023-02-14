@@ -1292,6 +1292,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   moveDir: 0
+  render: {fileID: 338434380}
   isGrounded: 0
 --- !u!136 &1140039105
 CapsuleCollider:

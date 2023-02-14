@@ -9,7 +9,8 @@ public class RunState : BaseState
 
     public override void UpdateState()
     {
-        
+        CheckSwitchState();
+        _ctx.render.color = UnityEngine.Color.green;
     }
 
     public override void Exit()

@@ -4,12 +4,14 @@ public class IdleState : BaseState
 
     public override void Enter()
     {
-        
+        //_ctx.DebugLog("Idle");
+        _ctx.render.color = UnityEngine.Color.black;
     }
 
     public override void UpdateState()
     {
-        
+        CheckSwitchState();
+        _ctx.render.color = UnityEngine.Color.black;
     }
 
     public override void Exit()

@@ -1,5 +1,6 @@
 public abstract class BaseState
 {
+    protected bool isRootState;
     protected StateMachine _ctx;
     protected StateFactory _factory;
     protected BaseState _currentSubstate;
@@ -34,7 +35,14 @@ public abstract class BaseState
         //enter  new state
         newState.Enter();
         // update current state to new staste
-        _ctx.CurrentState = newState;
+        if (isRootState)
+        {
+            _ctx.CurrentState = newState;
+        }
+        else if (_currentSuperstate != null)
+        {
+            _currentSuperstate.SetSubState(newState);
+        }
     }
     protected void SetSuperState(BaseState newSuperState) 
     {
