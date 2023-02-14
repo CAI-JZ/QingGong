@@ -1,23 +1,50 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class BaseState
+public abstract class BaseState
 {
-    public string name;
-    protected StateMachine stateMachine;
-    protected CharacterData charData;
+    protected StateMachine _ctx;
+    protected StateFactory _factory;
+    protected BaseState _currentSubstate;
+    protected BaseState _currentSuperstate;
+    public string stateName;
 
-    public BaseState(string name, StateMachine stateMachine, CharacterData charData)
+    public BaseState(StateMachine currentContext, StateFactory stateFactory, string name)
     {
-        this.name = name;
-        this.stateMachine = stateMachine;
-        this.charData = charData;
+        _ctx = currentContext;
+        _factory = stateFactory;
+        stateName = name;
     }
 
-    public virtual void Enter() { }
-    public virtual void UpdateLogic() { }
-    public virtual void UpdatePhysics() { }
-    public virtual void Exit() { }
+    public abstract void Enter();
+    public abstract void UpdateState();
+    public abstract void Exit();
+    public abstract void CheckSwitchState();
+    public abstract void InitializeSubState();
 
+    public void UpdateStates() 
+    {
+        UpdateState();
+        if (_currentSubstate != null)
+        {
+            _currentSubstate.UpdateStates();
+        }
+    }
+    protected void SwitchState(BaseState newState) 
+    {
+        //current state exits state
+        Exit();
+        //enter  new state
+        newState.Enter();
+        // update current state to new staste
+        _ctx.CurrentState = newState;
+    }
+    protected void SetSuperState(BaseState newSuperState) 
+    {
+        _currentSuperstate = newSuperState;
+       
+    }
+
+    protected void SetSubState(BaseState newSubState)
+    {
+        _currentSubstate = newSubState;
+        newSubState.SetSuperState(this);
+    }
 }

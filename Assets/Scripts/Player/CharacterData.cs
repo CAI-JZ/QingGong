@@ -7,6 +7,7 @@ public class CharacterData : MonoBehaviour
     //BaseData
     [Header("Base Data")]
     public float moveSpeed =0;
+    public float gravity;
 
     //Move
     [Header("Move")]

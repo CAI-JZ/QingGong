@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterData))]
+
 public class CharacterMovement : MonoBehaviour
 {
     //Move
@@ -11,7 +11,7 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] Vector3 moveDirection; //用来替代velocity，是一个单位向量，用来表示从碰撞获得的移动方向。
     [SerializeField] float moveDir;
     private bool isControllable;
-    CharacterData charData;
+    
 
     [Header("JUMP")]
     //Character Basic data
@@ -67,7 +67,7 @@ public class CharacterMovement : MonoBehaviour
     {
         isControllable = true;
         _qiValue = GetComponent<QiValue>();
-        charData = GetComponent<CharacterData>();
+        
     }
 
     // Update is called once per frame
@@ -83,7 +83,7 @@ public class CharacterMovement : MonoBehaviour
 #endif
 
         JumpOptimation();
-        //CalculateWalk();
+        CalculateWalk();
         CalculateJumpApex();
         Gravity();
         Jump();
@@ -95,7 +95,7 @@ public class CharacterMovement : MonoBehaviour
 
     private void CharacterMove()
     {
-        Velocity.x = charData.moveSpeed * moveDir;
+        Velocity.x = moveClamp * moveDir;
         transform.position += Velocity * Time.deltaTime;
     }
 
