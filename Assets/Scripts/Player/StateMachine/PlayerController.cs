@@ -10,7 +10,7 @@ public class PlayerController : StateMachine
 
     [Header("Base Data")]
     [SerializeReference] private float maxSpeed;
-    public Vector3 velocity; 
+    [SerializeField]public Vector3 velocity; 
 
     [Header("Move")]
     public float moveAcceleration = 50f;
@@ -21,10 +21,13 @@ public class PlayerController : StateMachine
     private bool jumpInputDown;
     private bool jumpInputUp;
 
+    public bool isControl = true;
+
     public float InputDir => inputDir;
     public float MaxSpeed => maxSpeed;
 
-    public bool IsTouchWall => velocity.x > 0 && _charMove.rightRay || velocity.x < 0 && _charMove.leftRay;
+    public bool IsTouchWall => (velocity.x > 0 && _charMove.rightRay) || (velocity.x < 0 && _charMove.leftRay);
+    public bool IsGrounded => _charMove.downRay && _charMove.downInfo.collider.tag == "Ground";
 
     private void Awake()
     {
@@ -42,13 +45,17 @@ public class PlayerController : StateMachine
 
         base.Update();
         InputDetector();
-        if (IsTouchWall)
-        {
-            Debug.Log(IsTouchWall);
-        }
-        
+        CheckWall();
     }
 
+    private void CheckWall()
+    {
+        if (IsTouchWall)
+        {
+            velocity.x = 0;
+            SwitchState(_moveFactory.Idle());
+        }
+    }
 
     protected override BaseState GetInitialState()
     {
@@ -58,10 +65,8 @@ public class PlayerController : StateMachine
             return null;
         }
         else
-        {
-            Debug.LogWarning("Ë³Àû»ñÈ¡Idle");
+        {   
             return _moveFactory.Idle();
-            
         }
     }
 

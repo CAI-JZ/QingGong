@@ -6,17 +6,13 @@ public class RunState : GroundedState
 
     public override void Enter()
     {
-        _controller.DebugLog("进入到跑步状态了");
+        _controller.DebugLog("Run");
     }
 
     public override void UpdateState()
     {
-        if (_controller.InputDir == 0)
+        if (_controller.InputDir == 0 )
         {
-            if (_controller.IsTouchWall)
-            {
-                _controller.velocity.x = 0;
-            }
             _controller.SwitchState(_moveFactory.Idle());
         }
         CalculateWalk();
@@ -31,6 +27,7 @@ public class RunState : GroundedState
     private void CalculateWalk()
     {
         // speed acceleration when input
+        //_controller.DebugLog("开始加速");
         _controller.velocity.x += _controller.InputDir * _controller.moveAcceleration * Time.deltaTime;
         _controller.velocity.x = Mathf.Clamp(_controller.velocity.x, -_controller.MaxSpeed, _controller.MaxSpeed);
     }

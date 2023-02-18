@@ -1,14 +1,15 @@
+using System.Collections;
 using UnityEngine;
 
 public class IdleState : GroundedState
 {
     public IdleState(PlayerController stateMachine, MovementStateFactory factory) : base(stateMachine,factory,"Idle") { }
 
-    
 
     public override void Enter()
     {
         _controller.DebugLog("Idle");
+
     }
 
     public override void UpdateState()
@@ -18,12 +19,8 @@ public class IdleState : GroundedState
         {
             _controller.velocity.x = Mathf.MoveTowards(_controller.velocity.x, 0, _controller.deAcceleration * Time.deltaTime);
         }
-        if (_controller.IsTouchWall)
+        if (_controller.InputDir != 0)
         {
-            return;
-        }
-        else if (_controller.InputDir != 0 )
-        { 
             _controller.SwitchState(_moveFactory.Run());
         }
 
@@ -33,7 +30,7 @@ public class IdleState : GroundedState
 
     public override void Exit()
     {
-        _controller.DebugLog("准备跑起来。");
+        
     }
 
 }

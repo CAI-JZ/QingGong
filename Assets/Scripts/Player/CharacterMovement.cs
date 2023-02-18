@@ -17,6 +17,7 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField]private float currentSpeed;
     public float CurrentSpeed { get { return currentSpeed; } set { currentSpeed = value; } }
     
+    
 
     [Header("JUMP")]
     //Character Basic data
@@ -49,7 +50,7 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] private float rayDis = 0.5f;
     [SerializeField] private float rayDisDown = 0.7f;
     [SerializeField] public bool rightRay, leftRay, upRay, downRay;
-    private RaycastHit rightInfo, leftInfo, upInfo, downInfo;
+    public RaycastHit rightInfo, leftInfo, upInfo, downInfo;
 
     [Header("QI")]
     //qinggong
@@ -85,7 +86,10 @@ public class CharacterMovement : MonoBehaviour
         Gravity();
         Jump();
         //WallWalk();
-        CharacterMove();
+        if (_controller.isControl)
+        { 
+            CharacterMove();
+        }
        //physics.SyncTransforms();
     }
 
@@ -257,102 +261,102 @@ public class CharacterMovement : MonoBehaviour
 
 
 
-    private void UseQinggong()
-    {
-        if (!downRay && useQi && _qiValue.DecreaseQi(1))
-        {
-            StopCoroutine(Qinggong());
-            StartCoroutine(Qinggong());
-            //Velocity.y = qiJumpPower;
-            //if (moveDir < 0)
-            //{
-            //    Velocity.x = 60f * moveDir;
-            //}
-            //else
-            //{
-            //    Velocity.x = 60f;
-            //}
+    //private void UseQinggong()
+    //{
+    //    if (!downRay && useQi && _qiValue.DecreaseQi(1))
+    //    {
+    //        StopCoroutine(Qinggong());
+    //        StartCoroutine(Qinggong());
+    //        //Velocity.y = qiJumpPower;
+    //        //if (moveDir < 0)
+    //        //{
+    //        //    Velocity.x = 60f * moveDir;
+    //        //}
+    //        //else
+    //        //{
+    //        //    Velocity.x = 60f;
+    //        //}
 
-            // Velocity.x = Mathf.Lerp(Velocity.sx, 0, 0.2f * Time.deltaTime);
-        }
-    }
+    //        // Velocity.x = Mathf.Lerp(Velocity.sx, 0, 0.2f * Time.deltaTime);
+    //    }
+    //}
 
     //待优化
-    IEnumerator Qinggong()
-    {
-        float inputHori = moveDir;
-        float inputVert = 1;
-        Vector2 dashDir = new Vector2(moveDir, inputVert).normalized;
-        isControllable = false;
-        int i = 0;
-        while (i < 9)
-        {
-            Velocity = dashDir * qiJumpPower;
-            i++;
-            yield return new WaitForFixedUpdate();
-        }
-        Velocity = Vector3.zero;
-        isControllable = true;
-    }
+    //IEnumerator Qinggong()
+    //{
+    //    float inputHori = moveDir;
+    //    float inputVert = 1;
+    //    Vector2 dashDir = new Vector2(moveDir, inputVert).normalized;
+    //    isControllable = false;
+    //    int i = 0;
+    //    while (i < 9)
+    //    {
+    //        Velocity = dashDir * qiJumpPower;
+    //        i++;
+    //        yield return new WaitForFixedUpdate();
+    //    }
+    //    Velocity = Vector3.zero;
+    //    isControllable = true;
+    //}
 
-    private void BorrowPower()
-    {
-        if (CheckRechargeableItem())
-        {
-            Debug.Log("可以借力");
-            _qiValue.IncreaseQi(1);
-            StopCoroutine("Qinggong");
-            StartCoroutine("Qinggong");
-            }
-        else
-        {
-            Debug.Log("不可以借力");
-        }
-    }
+    //private void BorrowPower()
+    //{
+    //    if (CheckRechargeableItem())
+    //    {
+    //        Debug.Log("可以借力");
+    //        _qiValue.IncreaseQi(1);
+    //        StopCoroutine("Qinggong");
+    //        StartCoroutine("Qinggong");
+    //        }
+    //    else
+    //    {
+    //        Debug.Log("不可以借力");
+    //    }
+    //}
 
 
     //移动到QinggongScript
-    private bool CheckRechargeableItem()
-    {
-        if (downInfo.collider != null && downInfo.collider.tag != "Ground")
-        {
-            downInfo.collider.gameObject.TryGetComponent(out IBorrow borrowable);
-            GetItemInfo(borrowable);
-        }
-        else if (rightInfo.collider != null && rightInfo.collider.tag != "Ground")
-        {
-            rightInfo.collider.gameObject.TryGetComponent(out IBorrow borrowable);
-            GetItemInfo(borrowable);
-        }
-        else if (leftInfo.collider != null && leftInfo.collider.tag != "Ground")
-        {
-            leftInfo.collider.gameObject.TryGetComponent(out IBorrow borrowable);
-            GetItemInfo(borrowable);
-        }
+    //private bool CheckRechargeableItem()
+    //{
+    //    if (downInfo.collider != null && downInfo.collider.tag != "Ground")
+    //    {
+    //        downInfo.collider.gameObject.TryGetComponent(out IBorrow borrowable);
+    //        GetItemInfo(borrowable);
+    //    }
+    //    else if (rightInfo.collider != null && rightInfo.collider.tag != "Ground")
+    //    {
+    //        rightInfo.collider.gameObject.TryGetComponent(out IBorrow borrowable);
+    //        GetItemInfo(borrowable);
+    //    }
+    //    else if (leftInfo.collider != null && leftInfo.collider.tag != "Ground")
+    //    {
+    //        leftInfo.collider.gameObject.TryGetComponent(out IBorrow borrowable);
+    //        GetItemInfo(borrowable);
+    //    }
 
-        return canRecharge;
-    }
+    //    return canRecharge;
+    //}
 
-    private void GetItemInfo (IBorrow bor)
-    {
-        currentRechargeType = bor.GetBorrowableType();
-        StopCoroutine(CanRechargeWindow());
-        StartCoroutine(CanRechargeWindow());
-    }
+    //private void GetItemInfo (IBorrow bor)
+    //{
+    //    currentRechargeType = bor.GetBorrowableType();
+    //    StopCoroutine(CanRechargeWindow());
+    //    StartCoroutine(CanRechargeWindow());
+    //}
 
-    IEnumerator CanRechargeWindow()
-    {
-        canRecharge = true;
-        rechargeTimer = rechargeTime;
-        while (rechargeTimer > 0)
-        {
-            rechargeTimer -= Time.deltaTime;
-            yield return new WaitForFixedUpdate();
-        }
-        rechargeTimer = 0f;
-        canRecharge = false;
-        currentRechargeType = BorrowableType.Defult;
-    }
+    //IEnumerator CanRechargeWindow()
+    //{
+    //    canRecharge = true;
+    //    rechargeTimer = rechargeTime;
+    //    while (rechargeTimer > 0)
+    //    {
+    //        rechargeTimer -= Time.deltaTime;
+    //        yield return new WaitForFixedUpdate();
+    //    }
+    //    rechargeTimer = 0f;
+    //    canRecharge = false;
+    //    currentRechargeType = BorrowableType.Defult;
+    //}
 }
 
 
