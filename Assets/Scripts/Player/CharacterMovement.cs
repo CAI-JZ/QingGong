@@ -2,15 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
+[RequireComponent(typeof(PlayerController))]
 public class CharacterMovement : MonoBehaviour
 {
+    //Reference
+    PlayerController _controller;
+
     //Move
     [Header("BASIC DATA")]
     [SerializeField] Vector3 Velocity;
     [SerializeField] Vector3 moveDirection; //用来替代velocity，是一个单位向量，用来表示从碰撞获得的移动方向。
     [SerializeField] float moveDir;
     private bool isControllable;
+    [SerializeField]private float currentSpeed;
+    public float CurrentSpeed { get { return currentSpeed; } set { currentSpeed = value; } }
     
 
     [Header("JUMP")]
@@ -35,15 +40,15 @@ public class CharacterMovement : MonoBehaviour
 
     //Moves
     [Header("MOVE")]
-    public float moveAcceleration = 50f;
-    public float deAcceleration = 50f;
-    public float moveClamp = 13f;
+    //public float moveAcceleration = 50f;
+    //public float deAcceleration = 50f;
+    //public float moveClamp = 13f;
 
     [Header("RAY")]
     //RayCast
     [SerializeField] private float rayDis = 0.5f;
     [SerializeField] private float rayDisDown = 0.7f;
-    [SerializeField] private bool rightRay, leftRay, upRay, downRay;
+    [SerializeField] public bool rightRay, leftRay, upRay, downRay;
     private RaycastHit rightInfo, leftInfo, upInfo, downInfo;
 
     [Header("QI")]
@@ -66,54 +71,49 @@ public class CharacterMovement : MonoBehaviour
     private void Awake()
     {
         isControllable = true;
-        _qiValue = GetComponent<QiValue>();
-        
+        _controller = GetComponent<PlayerController>();
     }
 
     // Update is called once per frame
     void Update()
     {
         RayDetector();
-        InputDetector();
-        //CheckRechargeableItem();
-
-#if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.R)) _qiValue.IncreaseQi(1);
-        if (Input.GetKeyDown(KeyCode.Mouse1)) BorrowPower();
-#endif
 
         JumpOptimation();
         CalculateWalk();
         CalculateJumpApex();
         Gravity();
         Jump();
-        WallWalk();
-        //UseQinggong();
-
+        //WallWalk();
         CharacterMove();
+       //physics.SyncTransforms();
+    }
+
+    private void FixedUpdate()
+    {
+        
     }
 
     private void CharacterMove()
-    {
-        Velocity.x = moveClamp * moveDir;
-        transform.position += Velocity * Time.deltaTime;
+    { 
+        transform.position += _controller.velocity * Time.deltaTime;
     }
 
     private void CalculateWalk()
     {
         if (isControllable)
         {
-            if (moveDir != 0)
-            {
-                // speed acceleration when input
-                Velocity.x += moveDir * moveAcceleration * Time.deltaTime;
-                Velocity.x = Mathf.Clamp(Velocity.x, -moveClamp, moveClamp);
-            }
-            else
-            {
-                //deacceleration  when not input
-                Velocity.x = Mathf.MoveTowards(Velocity.x, 0, deAcceleration * Time.deltaTime);
-            }
+            //if (moveDir != 0)
+            //{
+            //    // speed acceleration when input
+            //    Velocity.x += moveDir * moveAcceleration * Time.deltaTime;
+            //    Velocity.x = Mathf.Clamp(Velocity.x, -moveClamp, moveClamp);
+            //}
+            //else
+            //{
+            //    //deacceleration  when not input
+            //    Velocity.x = Mathf.MoveTowards(Velocity.x, 0, deAcceleration * Time.deltaTime);
+            //}
             // check wall
             if (Velocity.x > 0 && rightRay || Velocity.x < 0 && leftRay)
             {
@@ -122,11 +122,6 @@ public class CharacterMovement : MonoBehaviour
         }
     }
 
-    //add a function to chadnge the velocity
-    public void SmoothlyChangeVelocity()
-    {
-
-    }
 
     private void CalculateJumpApex()
     {
@@ -241,14 +236,14 @@ public class CharacterMovement : MonoBehaviour
     }
 
 
-    public void InputDetector()
-    {
-        moveDir = PlayerInput._instance.moveDir;
-        jumpInputDown = PlayerInput._instance.jumpBtnDown;
-        jumpInputUp = PlayerInput._instance.jumpBtnUp;
-        isQi = Input.GetKey(KeyCode.Mouse0);
-        useQi = Input.GetKeyDown(KeyCode.Mouse0);
-    }
+    //public void InputDetector()
+    //{
+    //    moveDir = PlayerInput._instance.moveDir;
+    //    jumpInputDown = PlayerInput._instance.jumpBtnDown;
+    //    jumpInputUp = PlayerInput._instance.jumpBtnUp;
+    //    isQi = Input.GetKey(KeyCode.Mouse0);
+    //    useQi = Input.GetKeyDown(KeyCode.Mouse0);
+    //}
 
     private void RayDetector()
     {
@@ -257,6 +252,7 @@ public class CharacterMovement : MonoBehaviour
         upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis, (1 << 10));
         downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDisDown, (1 << 10 | 1 << 6));
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDis, Color.red, 1);
+        Debug.DrawLine(transform.position, transform.position + Vector3.left * rayDis, Color.red, 1);
     }
 
 
