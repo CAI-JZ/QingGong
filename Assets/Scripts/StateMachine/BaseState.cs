@@ -13,5 +13,6 @@ public abstract class BaseState
 
     public virtual void Enter() { }
     public virtual void UpdateState() { }
+    public virtual void UpdatePhysic() { }
     public virtual void Exit() { }
 }

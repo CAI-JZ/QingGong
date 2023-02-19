@@ -9,19 +9,29 @@ public class JumpState : BaseState
     {
         _controller = (PlayerController)stateMachine;
         _moveFactory = (MovementStateFactory)factory;
-
     }
 
 
     public override void Enter()
     {
-        //_ctx.rb.mass = 2;
+        _controller.JumpInputBufferTimer = _controller.JumpInputBuffer;
 
     }
 
     public override void UpdateState()
     {
+        if (_controller.JumpInputUp)
+        {
+            _controller.SwitchState(_moveFactory.Fall());
+        }
+        JumpOptimazation();
+        
+    }
 
+    public override void UpdatePhysic()
+    {
+        base.UpdatePhysic();
+        HandleJump();
     }
 
     public override void Exit()
@@ -32,19 +42,29 @@ public class JumpState : BaseState
 
     }
 
-    //public override void CheckSwitchState()
-    //{
-    //    if (_ctx.IsGrounded)
-    //    {
-    //        _ctx.DebugLog("在落地");
-    //        SwitchState(_factory.Grounded());
-    //    }
-    //    //else if (_ctx.rb.velocity.y < 0)
-    //    //{
-    //    //    _ctx.DebugLog("正在下落");
-    //    //    SwitchState(_factory.Fall());
+    private void HandleJump()
+    {
+        if (_controller.CanJump)
+        {
+            _controller.velocity.y = _controller.JumpHight;
+            _controller.JumpInputBufferTimer = 0;
+        }
+        if(_controller.CheckIsJumpEarly)
+        {
+            _controller.IsJumpEarlyUp = true;
+        }
+    }
 
-    //    //}
+    private void JumpOptimazation()
+    {
+        _controller.CoyoteJumpTimer -= Time.deltaTime;
+        _controller.CoyoteJumpTimer = Mathf.Clamp(_controller.CoyoteJumpTimer, -0.2f, _controller.CoyoteJump);
 
-
+        //Input Buffer
+        if (!PlayerInput._instance.jumpBtnDown)
+        {
+            _controller.JumpInputBufferTimer -= Time.deltaTime;
+            if (_controller.JumpInputBufferTimer < 0) _controller.JumpInputBufferTimer = 0;
+        }
+    }
 }

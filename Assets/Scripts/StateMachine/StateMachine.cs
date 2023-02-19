@@ -32,6 +32,13 @@ public class StateMachine : MonoBehaviour
         }
     }
 
+    protected virtual void LateUpdate()
+    {
+        if (_currentState != null)
+        {
+            _currentState.UpdatePhysic();
+        }
+    }
 
     public virtual void Transition(BaseState value)
     {

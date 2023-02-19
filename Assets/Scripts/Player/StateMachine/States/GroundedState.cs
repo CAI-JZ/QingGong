@@ -13,17 +13,32 @@ public class GroundedState : BaseState
 
     public override void Enter()
     {
-
+        _controller.velocity.y = 0;
+        _controller.transform.position = _controller._charMove.downInfo.point + new Vector3(0, 0.9f, 0);
+        _controller.CoyoteJumpTimer = _controller.CoyoteJump;
+        _controller.IsJumpEarlyUp = false;
     }
 
     public override void UpdateState()
     {
-  
+        if (PlayerInput._instance.jumpBtnDown)
+        {
+            _controller.SwitchState(_moveFactory.Jump());
+        }
+        if (!_controller.IsGrounded)
+        {
+            _controller.DebugLog("ÏÂÂä");
+            _controller.SwitchState(_moveFactory.Fall());
+        }
+    }
+
+    public override void UpdatePhysic()
+    {
+        base.UpdatePhysic();
     }
 
     public override void Exit()
     {
         
     }
-
 }

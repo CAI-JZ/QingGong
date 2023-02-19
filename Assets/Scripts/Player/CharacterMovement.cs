@@ -8,47 +8,10 @@ public class CharacterMovement : MonoBehaviour
     //Reference
     PlayerController _controller;
 
-    //Move
-    [Header("BASIC DATA")]
-    [SerializeField] Vector3 Velocity;
-    [SerializeField] Vector3 moveDirection; //用来替代velocity，是一个单位向量，用来表示从碰撞获得的移动方向。
-    [SerializeField] float moveDir;
-    private bool isControllable;
-    [SerializeField]private float currentSpeed;
-    public float CurrentSpeed { get { return currentSpeed; } set { currentSpeed = value; } }
-    
-    
-
-    [Header("JUMP")]
-    //Character Basic data
-    [SerializeField] private float jumpHight = 30f;
-    [SerializeField] private float jumpApexThreshold = 10f;
-    [SerializeField] private float jumpEarlyMul = 3f;
-    [SerializeField] private float coyoteJump = 0.2f;
-    [SerializeField] private float jumpInputBuffer = 0.2f;
-    private float coyoteJumpTimer;
-    private float jumpInputBufferTimer;
-    private bool jumpInputDown;
-    private bool jumpInputUp;
-    [SerializeField] private float apexPoint;
-
-    [Header("GRAVITY")]
-    [SerializeField] private float gravityClamp = -30f;
-    [SerializeField] private float minFallGravity = 80f;
-    [SerializeField] private float maxFallGraviyt = 120f;
-    private bool isJumpEarlyUp;
-    [SerializeField] public float fallGravity;
-
-    //Moves
-    [Header("MOVE")]
-    //public float moveAcceleration = 50f;
-    //public float deAcceleration = 50f;
-    //public float moveClamp = 13f;
-
     [Header("RAY")]
     //RayCast
     [SerializeField] private float rayDis = 0.5f;
-    [SerializeField] private float rayDisDown = 0.7f;
+    [SerializeField] private float rayDisDown = 1f;
     [SerializeField] public bool rightRay, leftRay, upRay, downRay;
     public RaycastHit rightInfo, leftInfo, upInfo, downInfo;
 
@@ -64,14 +27,9 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] private float rechargeTime;
     private float rechargeTimer;
 
-    [Header("OTHER")]
-    //GroundCheck
-    [SerializeField] private LayerMask groundLayer;
-    //[SerializeField] private bool isGround;
 
     private void Awake()
     {
-        isControllable = true;
         _controller = GetComponent<PlayerController>();
     }
 
@@ -79,145 +37,10 @@ public class CharacterMovement : MonoBehaviour
     void Update()
     {
         RayDetector();
-
-        JumpOptimation();
-        CalculateWalk();
-        CalculateJumpApex();
-        Gravity();
-        Jump();
-        //WallWalk();
-        if (_controller.isControl)
-        { 
-            CharacterMove();
-        }
-       //physics.SyncTransforms();
+       
     }
 
-    private void FixedUpdate()
-    {
-        
-    }
-
-    private void CharacterMove()
-    { 
-        transform.position += _controller.velocity * Time.deltaTime;
-    }
-
-    private void CalculateWalk()
-    {
-        if (isControllable)
-        {
-            //if (moveDir != 0)
-            //{
-            //    // speed acceleration when input
-            //    Velocity.x += moveDir * moveAcceleration * Time.deltaTime;
-            //    Velocity.x = Mathf.Clamp(Velocity.x, -moveClamp, moveClamp);
-            //}
-            //else
-            //{
-            //    //deacceleration  when not input
-            //    Velocity.x = Mathf.MoveTowards(Velocity.x, 0, deAcceleration * Time.deltaTime);
-            //}
-            // check wall
-            if (Velocity.x > 0 && rightRay || Velocity.x < 0 && leftRay)
-            {
-                Velocity.x = 0;
-            }
-        }
-    }
-
-
-    private void CalculateJumpApex()
-    {
-        if (!downRay)
-        {
-            apexPoint = Mathf.InverseLerp(jumpApexThreshold, 0, Mathf.Abs(Velocity.y));
-            fallGravity = Mathf.Lerp(minFallGravity, maxFallGraviyt, apexPoint);
-        }
-        else
-        {
-            apexPoint = 0;
-        }
-    }
-
-    private void Jump()
-    {
-        if (isControllable)
-        {
-            if (jumpInputBufferTimer > 0 && coyoteJumpTimer > 0)
-            {
-                Velocity.y = jumpHight;
-                jumpInputBufferTimer = 0;
-            }
-            if (!downRay && jumpInputUp && Velocity.y > 0)
-            {
-                isJumpEarlyUp = true;
-            }
-
-        }
-    }
-
-    private void JumpOptimation()
-    {
-        // coyote Jump
-        if (downRay)
-        {
-            coyoteJumpTimer = coyoteJump;
-        }
-        else
-        {
-            coyoteJumpTimer -= Time.deltaTime;
-            coyoteJumpTimer = Mathf.Clamp(coyoteJumpTimer, -0.2f, coyoteJump);
-        }
-
-        //Inputbuffer
-        if (jumpInputDown)
-        {
-            jumpInputBufferTimer = jumpInputBuffer;
-        }
-        else
-        {
-            jumpInputBufferTimer -= Time.deltaTime;
-            //jumpInputBufferTimer = Mathf.Clamp(jumpInputBufferTimer, 0, jumpInputBuffer);
-            if (jumpInputBufferTimer < 0) jumpInputBufferTimer = 0;
-
-        }
-    }
-
-    private void Gravity()
-    {
-        //float fallSpeed = 0;
-
-        if (downRay)
-        {
-            if (Velocity.y < 0 && downInfo.collider.tag == "Ground")
-            {
-                Velocity.y = 0;
-                transform.position = downInfo.point + new Vector3(0, 0.5f, 0);
-                isJumpEarlyUp = false;
-            }
-            return;
-        }
-        else
-        {
-            float fallspeed;
-            if (isJumpEarlyUp && Velocity.y > 0)
-            {
-                fallspeed = fallGravity * jumpEarlyMul;
-            }
-            else
-            {
-                fallspeed = fallGravity;
-            }
-            if (isQi && Velocity.y < 0)
-            {
-                fallspeed = fallGravity * qiGraviytMul;
-            }
-            Velocity.y -= fallspeed * Time.deltaTime;
-            if (Velocity.y < gravityClamp) Velocity.y = gravityClamp;
-
-        }
-    }
+   
 
     private void WallWalk()
     {
@@ -234,20 +57,10 @@ public class CharacterMovement : MonoBehaviour
             Debug.Log(angle);
             if (angle >= -0.01f)
             { 
-                Velocity = new Vector3 (wallForward.x, wallForward.y, Velocity.z) * 10 * moveDir;
+                _controller.velocity = new Vector3 (wallForward.x, wallForward.y, _controller.velocity.z) * 10 * _controller.InputDir;
             }
         }
     }
-
-
-    //public void InputDetector()
-    //{
-    //    moveDir = PlayerInput._instance.moveDir;
-    //    jumpInputDown = PlayerInput._instance.jumpBtnDown;
-    //    jumpInputUp = PlayerInput._instance.jumpBtnUp;
-    //    isQi = Input.GetKey(KeyCode.Mouse0);
-    //    useQi = Input.GetKeyDown(KeyCode.Mouse0);
-    //}
 
     private void RayDetector()
     {
@@ -255,7 +68,7 @@ public class CharacterMovement : MonoBehaviour
         leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, ( 1 << 6));
         upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis, (1 << 10));
         downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDisDown, (1 << 10 | 1 << 6));
-        Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDis, Color.red, 1);
+        Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDisDown, Color.red, 1);
         Debug.DrawLine(transform.position, transform.position + Vector3.left * rayDis, Color.red, 1);
     }
 

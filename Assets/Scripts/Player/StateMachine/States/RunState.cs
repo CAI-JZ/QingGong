@@ -6,15 +6,23 @@ public class RunState : GroundedState
 
     public override void Enter()
     {
+        base.Enter();
         _controller.DebugLog("Run");
     }
 
     public override void UpdateState()
     {
+        base.UpdateState();
         if (_controller.InputDir == 0 )
         {
             _controller.SwitchState(_moveFactory.Idle());
         }
+        
+    }
+
+    public override void UpdatePhysic()
+    {
+        base.UpdatePhysic();
         CalculateWalk();
     }
 
@@ -27,7 +35,6 @@ public class RunState : GroundedState
     private void CalculateWalk()
     {
         // speed acceleration when input
-        //_controller.DebugLog("开始加速");
         _controller.velocity.x += _controller.InputDir * _controller.moveAcceleration * Time.deltaTime;
         _controller.velocity.x = Mathf.Clamp(_controller.velocity.x, -_controller.MaxSpeed, _controller.MaxSpeed);
     }

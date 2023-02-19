@@ -1966,11 +1966,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a7aeabaf1e98e34aa67a3ab9f0abe36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _charMove: {fileID: 0}
   maxSpeed: 0
   velocity: {x: 0, y: 0, z: 0}
   moveAcceleration: 0
   deAcceleration: 0
   inputDir: 0
+  jumpHight: 30
+  jumpApexThreshold: 10
+  jumpEarlyMul: 3
+  coyoteJump: 0.2
+  jumpInputBuffer: 0.2
+  apexPoint: 0
+  gravityClamp: -30
+  minFallGravity: 80
+  maxFallGraviyt: 120
+  fallGravity: 0
   isControl: 1
 --- !u!136 &1140039105
 CapsuleCollider:
@@ -3403,11 +3414,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a7aeabaf1e98e34aa67a3ab9f0abe36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _charMove: {fileID: 0}
   maxSpeed: 8
   velocity: {x: 0, y: 0, z: 0}
   moveAcceleration: 1200
   deAcceleration: 1500
   inputDir: 0
+  jumpHight: 30
+  jumpApexThreshold: 10
+  jumpEarlyMul: 3
+  coyoteJump: 0.2
+  jumpInputBuffer: 0.2
+  apexPoint: 0
+  gravityClamp: -10
+  minFallGravity: 80
+  maxFallGraviyt: 120
+  fallGravity: 0
   isControl: 1
 --- !u!136 &2097722071
 CapsuleCollider:
@@ -3420,9 +3442,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.25264513
-  m_Height: 1.7942389
+  m_Height: 1.7720708
   m_Direction: 1
-  m_Center: {x: 0.13476574, y: 0.8592939, z: 0}
+  m_Center: {x: 0.13476574, y: 0.01639074, z: 0}
 --- !u!4 &2097722072
 Transform:
   m_ObjectHideFlags: 0
@@ -3431,7 +3453,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2097722069}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.9, y: -2.16, z: 0}
+  m_LocalPosition: {x: -3.9, y: -1.42, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 306616193}
@@ -3450,22 +3472,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87e35b0e515b53347b4575e42078c006, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Velocity: {x: 0, y: 0, z: 0}
-  moveDirection: {x: 0, y: 0, z: 0}
-  moveDir: 0
-  currentSpeed: 0
-  jumpHight: 30
-  jumpApexThreshold: 10
-  jumpEarlyMul: 3
-  coyoteJump: 0.15
-  jumpInputBuffer: 0.1
-  apexPoint: 0
-  gravityClamp: -30
-  minFallGravity: 80
-  maxFallGraviyt: 120
-  fallGravity: 10
   rayDis: 0.55
-  rayDisDown: 0.7
+  rayDisDown: 1
   rightRay: 0
   leftRay: 0
   upRay: 0
@@ -3475,9 +3483,6 @@ MonoBehaviour:
   canRecharge: 0
   currentRechargeType: 0
   rechargeTime: 0.1
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 1024
 --- !u!1 &2109061601
 GameObject:
   m_ObjectHideFlags: 0

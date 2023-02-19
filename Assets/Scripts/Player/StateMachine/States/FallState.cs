@@ -15,22 +15,26 @@ public class FallState : BaseState
 
     public override void Enter()
     {
-        //_ctx.rb.mass = 30;
+        
     }
 
     public override void UpdateState()
     {
-        
+        if (_controller.IsGrounded)
+        {
+            _controller.SwitchState(_moveFactory.Idle());
+        }
+
+    }
+
+    public override void UpdatePhysic()
+    {
+        base.UpdatePhysic();
+
     }
 
     public override void Exit()
     {
-        
-    }
-
-   
-    private void HanldeGravity()
-    { 
         
     }
 }
