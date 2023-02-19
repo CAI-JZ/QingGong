@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class RunState : GroundedState
 {
-    public RunState(PlayerController stateMachine, MovementStateFactory factory) : base(stateMachine, factory, "Run") { }
+    public RunState(StateMachine stateMachine, StateFactory factory) : base(stateMachine, factory, "Run") { }
 
     public override void Enter()
     {
@@ -17,14 +17,9 @@ public class RunState : GroundedState
         {
             _controller.SwitchState(_moveFactory.Idle());
         }
-        
-    }
-
-    public override void UpdatePhysic()
-    {
-        base.UpdatePhysic();
         CalculateWalk();
     }
+
 
     public override void Exit()
     {
@@ -35,8 +30,8 @@ public class RunState : GroundedState
     private void CalculateWalk()
     {
         // speed acceleration when input
-        _controller.velocity.x += _controller.InputDir * _controller.moveAcceleration * Time.deltaTime;
-        _controller.velocity.x = Mathf.Clamp(_controller.velocity.x, -_controller.MaxSpeed, _controller.MaxSpeed);
+        _controller.currentVelocityX += _controller.moveAcceleration * Time.deltaTime;
+        _controller.currentVelocityX = Mathf.Clamp(_controller.currentVelocityX, -_controller.MaxSpeed, _controller.MaxSpeed);
     }
 
 }

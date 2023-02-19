@@ -15,22 +15,18 @@ public class FallState : BaseState
 
     public override void Enter()
     {
+        base.Enter();   
         
     }
 
     public override void UpdateState()
     {
+        base.UpdateState();
         if (_controller.IsGrounded)
         {
-            _controller.SwitchState(_moveFactory.Idle());
+            BaseState newstate = _controller.velocity.x != 0 ? _moveFactory.Idle() : _moveFactory.Run();
+            _controller.SwitchState(newstate);
         }
-
-    }
-
-    public override void UpdatePhysic()
-    {
-        base.UpdatePhysic();
-
     }
 
     public override void Exit()

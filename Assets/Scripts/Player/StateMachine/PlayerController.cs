@@ -16,6 +16,7 @@ public class PlayerController : StateMachine
     public float moveAcceleration = 50f;
     public float deAcceleration = 50f;
     [SerializeField]private float inputDir;
+    public float currentVelocityX;
 
     [Header("Jump")]
     [SerializeField] private float jumpHight = 30f;
@@ -35,7 +36,7 @@ public class PlayerController : StateMachine
     [SerializeField] private float maxFallGraviyt = 120f;
     private bool isJumpEarlyUp;
     [SerializeField] private float fallGravity;
-    private float fallSpeed;
+    [SerializeField]private float fallSpeed;
 
     public bool isControl = true;
     //[SerializeField]private bool downRay;
@@ -77,17 +78,18 @@ public class PlayerController : StateMachine
         CalculateJumpApex();
         base.Update();
         CalculateGravity();
+        if (!IsGrounded)
+        {
+            velocity.y -= fallSpeed * Time.deltaTime;
+            if (velocity.y < gravityClamp) velocity.y = gravityClamp;
+        }
         CharacterMove();
         CheckWall();   
     }
 
-    protected override void LateUpdate()
-    {
-        base.LateUpdate();
-    }
-
     private void CharacterMove()
     {
+        velocity.x = currentVelocityX * inputDir;
         transform.position += velocity * Time.deltaTime;
     }
 
@@ -111,13 +113,15 @@ public class PlayerController : StateMachine
         {
             apexPoint = 0;
         }
+
     }
 
     private void CalculateGravity()
     {
-        if (isJumpEarlyUp && velocity.y > 0)
+        if (CheckIsJumpEarly)
         {
             fallSpeed = fallGravity * jumpEarlyMul;
+            Debug.Log("IsJumpEarly");
         }
         else
         {
@@ -128,9 +132,6 @@ public class PlayerController : StateMachine
             velocity.y = 0;
             return;
         }
-        velocity.y -= fallSpeed * Time.deltaTime;
-        if (velocity.y < gravityClamp) velocity.y = gravityClamp;
-        
     }
 
     protected override BaseState GetInitialState()

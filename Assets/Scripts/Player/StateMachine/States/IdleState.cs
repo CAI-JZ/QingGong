@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class IdleState : GroundedState
 {
-    public IdleState(PlayerController stateMachine, MovementStateFactory factory) : base(stateMachine,factory,"Idle") { }
+
+    public IdleState(StateMachine stateMachine, StateFactory factory) : base(stateMachine, factory, "Idle") { }
 
 
     public override void Enter()
@@ -19,13 +20,7 @@ public class IdleState : GroundedState
         if (_controller.InputDir != 0)
         {
             _controller.SwitchState(_moveFactory.Run());
-        }   
-    }
-
-    public override void UpdatePhysic()
-    {
-        base.UpdatePhysic();
-        //deacceleration  when not input
+        }
         if (_controller.velocity.x != 0)
         {
             _controller.velocity.x = Mathf.MoveTowards(_controller.velocity.x, 0, _controller.deAcceleration * Time.deltaTime);

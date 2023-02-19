@@ -11,31 +11,32 @@ public class JumpState : BaseState
         _moveFactory = (MovementStateFactory)factory;
     }
 
-
     public override void Enter()
     {
+        base.Enter();
         _controller.JumpInputBufferTimer = _controller.JumpInputBuffer;
-
+        HandleJump();
     }
 
     public override void UpdateState()
     {
-        if (_controller.JumpInputUp)
+        base.UpdateState();
+        if (_controller.velocity.y < 0)
         {
             _controller.SwitchState(_moveFactory.Fall());
         }
+        //if (_controller.IsGrounded)
+        //{
+        //    BaseState newstate = _controller.velocity.x != 0 ? _moveFactory.Idle() : _moveFactory.Run();
+        //    _controller.SwitchState(newstate);
+        //}
         JumpOptimazation();
-        
     }
 
-    public override void UpdatePhysic()
-    {
-        base.UpdatePhysic();
-        HandleJump();
-    }
 
     public override void Exit()
     {
+        base.Enter();
         //when exit
         //stop animator;
         //cool down jump
@@ -49,7 +50,7 @@ public class JumpState : BaseState
             _controller.velocity.y = _controller.JumpHight;
             _controller.JumpInputBufferTimer = 0;
         }
-        if(_controller.CheckIsJumpEarly)
+        if (_controller.CheckIsJumpEarly)
         {
             _controller.IsJumpEarlyUp = true;
         }
