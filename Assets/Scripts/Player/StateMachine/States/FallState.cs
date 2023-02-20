@@ -22,10 +22,20 @@ public class FallState : BaseState
     public override void UpdateState()
     {
         base.UpdateState();
+        if (PlayerInput._instance.moveDir != Mathf.Epsilon && _controller.currentVelocityX == 0)
+        {
+            _controller.currentVelocityX += _controller.moveAcceleration * Time.deltaTime;
+            _controller.currentVelocityX = Mathf.Clamp(_controller.currentVelocityX, 0, _controller.MaxSpeed);
+        }
         if (_controller.IsGrounded)
         {
-            BaseState newstate = _controller.velocity.x != 0 ? _moveFactory.Idle() : _moveFactory.Run();
+            BaseState newstate = _controller.velocity.x == 0 ? _moveFactory.Idle() : _moveFactory.Run();
             _controller.SwitchState(newstate);
+        }
+        if (_controller.CanJump)
+        {
+            _controller.DebugLog("¥”fallState«–ªª");
+            //_controller.SwitchState(_moveFactory.Jump());
         }
     }
 

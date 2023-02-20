@@ -16,23 +16,23 @@ public class GroundedState : BaseState
     {
         base.Enter();
         _controller.velocity.y = 0;
-        
-        _controller.CoyoteJumpTimer = _controller.CoyoteJump;
+        if (_controller._charMove.downInfo.collider != null)
+        {
+            _controller.transform.position = _controller._charMove.downInfo.point + new Vector3(0, 0.9f, 0);
+        }
         _controller.IsJumpEarlyUp = false;
+        _controller.CoyoteJumpTimer = _controller.CoyoteJump;
     }
 
     public override void UpdateState()
     {
         base.UpdateState();
-        if (PlayerInput._instance.jumpBtnDown)
+        if (_controller.CanJump)
         {
             _controller.SwitchState(_moveFactory.Jump());
             _controller.DebugLog("switch to Jump state");
         }
-        if (_controller._charMove.downInfo.collider != null)
-        {
-            _controller.transform.position = _controller._charMove.downInfo.point + new Vector3(0, 0.9f, 0);
-        }
+
         //if (!_controller.IsGrounded)
         //{
         //    _controller.DebugLog("ÏÂÂä");

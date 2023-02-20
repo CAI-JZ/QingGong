@@ -21,9 +21,9 @@ public class IdleState : GroundedState
         {
             _controller.SwitchState(_moveFactory.Run());
         }
-        if (_controller.velocity.x != 0)
+        if (_controller.currentVelocityX != 0)
         {
-            _controller.velocity.x = Mathf.MoveTowards(_controller.velocity.x, 0, _controller.deAcceleration * Time.deltaTime);
+            _controller.currentVelocityX = Mathf.MoveTowards(_controller.currentVelocityX, 0, _controller.deAcceleration * Time.deltaTime);
         }
     }
 

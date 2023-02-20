@@ -31,7 +31,7 @@ public class RunState : GroundedState
     {
         // speed acceleration when input
         _controller.currentVelocityX += _controller.moveAcceleration * Time.deltaTime;
-        _controller.currentVelocityX = Mathf.Clamp(_controller.currentVelocityX, -_controller.MaxSpeed, _controller.MaxSpeed);
+        _controller.currentVelocityX = Mathf.Clamp(_controller.currentVelocityX, 0, _controller.MaxSpeed);
     }
 
 }

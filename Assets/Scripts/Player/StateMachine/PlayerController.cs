@@ -44,10 +44,6 @@ public class PlayerController : StateMachine
 
     public float InputDir => inputDir;
     public float MaxSpeed => maxSpeed;
-    public float FallSpeed => fallSpeed;
-    public float GravityClamp => gravityClamp;
-    //public bool JumpInputDown => jumpInputDown;
-    public bool JumpInputUp => jumpInputUp;
     public float JumpHight => jumpHight;
     public float CoyoteJump => coyoteJump;
     public float JumpInputBuffer => jumpInputBuffer;
@@ -78,6 +74,7 @@ public class PlayerController : StateMachine
         CalculateJumpApex();
         base.Update();
         CalculateGravity();
+        JumpOptimazation();
         if (!IsGrounded)
         {
             velocity.y -= fallSpeed * Time.deltaTime;
@@ -134,6 +131,24 @@ public class PlayerController : StateMachine
         }
     }
 
+    private void JumpOptimazation()
+    {
+        if (!IsGrounded)
+        {
+            coyoteJumpTimer -= Time.deltaTime;
+            coyoteJumpTimer = Mathf.Clamp(coyoteJumpTimer, -0.2f, coyoteJump);
+        }
+        //Input Buffer
+        if (jumpInputDown)
+        {
+            jumpInputBufferTimer = jumpInputBuffer;
+        }
+        else
+        {
+            jumpInputBufferTimer -= Time.deltaTime;
+            if (jumpInputBufferTimer < 0) jumpInputBufferTimer = 0;
+        }
+    }
     protected override BaseState GetInitialState()
     {
         if (_moveFactory == null)
