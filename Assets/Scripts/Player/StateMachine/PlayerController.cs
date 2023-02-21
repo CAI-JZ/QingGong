@@ -66,7 +66,8 @@ public class PlayerController : StateMachine
     public bool IsGrounded => _charMove.downRay; //&& _charMove.downInfo.collider.tag == "Ground";
     public bool CanJump => jumpInputBufferTimer > 0 && coyoteJumpTimer > 0;
     public bool CheckIsJumpEarly => !_charMove.downRay && jumpInputUp && velocity.y > 0;
-    public bool CanSlopeWalk => _charMove.canSlopeWalkOn;
+    public bool CanSlopeWalk => _charMove.wallAngle > Mathf.Epsilon ? true : false;
+    public Vector3 WallForward => _charMove.wallForward;
 
     private void Awake()
     {
@@ -99,6 +100,10 @@ public class PlayerController : StateMachine
         base.Update();
         CalculateGravity();
         isground = IsGrounded;
+        if (_charMove.wallAngle != 0)
+        { 
+            Debug.Log(_charMove.wallAngle);
+        }
         JumpOptimazation();
         CharacterMove();
         CheckWall();   
@@ -117,7 +122,6 @@ public class PlayerController : StateMachine
         }
         if (isControl)
         {
-            float dir = inputDir.x > 0 ? 1 : -1;
             velocity.x = currentVelX;
             transform.position += velocity * Time.deltaTime;
         } 

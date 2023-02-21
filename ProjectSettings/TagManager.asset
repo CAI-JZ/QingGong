@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Climable
+  - Slope
   layers:
   - Default
   - TransparentFX

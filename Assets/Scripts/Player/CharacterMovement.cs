@@ -10,12 +10,14 @@ public class CharacterMovement : MonoBehaviour
 
     [Header("RAY")]
     //RayCast
-    [SerializeField] private float rayDis = 0.5f;
+    [SerializeField] private float rayDis = 1f;
     [SerializeField] private float rayDisDown = 1f;
     [SerializeField] public bool rightRay, leftRay, upRay, downRay;
     public RaycastHit rightInfo, leftInfo, upInfo, downInfo;
 
-    public bool canSlopeWalkOn;
+    public Vector3 wallForward;
+    public float wallAngle;
+    public bool canSlpoeWalk;
 
     [Header("QI")]
     //qinggong
@@ -40,39 +42,45 @@ public class CharacterMovement : MonoBehaviour
     {
         RayDetector();
         WallWalk();
+        Physics.SyncTransforms();
+        canSlpoeWalk = rightRay && rightInfo.collider.tag == "Slope" || leftRay && leftInfo.collider.tag == "Slope";
     }
 
    
 
     private void WallWalk()
     {
-        if (rightRay || leftRay)
+        if (rightRay && rightInfo.collider.tag == "Slope" || leftRay && leftInfo.collider.tag == "Slope")
         {
-            
-            Vector3 wallNormal = rightRay ? rightInfo.normal : leftInfo.normal;
-            Vector3 wallForward = (Vector3.Cross(wallNormal, Vector3.forward)).normalized;
-            Debug.DrawLine(transform.position, transform.position + wallForward,Color.green);
+
+            Vector3 normal = rightRay ? rightInfo.normal : leftInfo.normal;
+            Vector3 forward = (Vector3.Cross(normal, Vector3.forward)).normalized;
+            Debug.DrawLine(transform.position, transform.position + forward, Color.green);
             Debug.DrawLine(transform.position, transform.position + Vector3.right, Color.blue);
-            Debug.DrawLine(transform.position, transform.position + Vector3.forward*2, Color.black);
-            Debug.DrawLine(transform.position, transform.position + wallNormal * 2, Color.red);
-            float angle = Vector3.Dot(wallForward, Vector3.right);
-            Debug.Log(angle);
-            canSlopeWalkOn = angle > Mathf.Epsilon ? true : false;
+            Debug.DrawLine(transform.position, transform.position + Vector3.forward * 2, Color.black);
+            Debug.DrawLine(transform.position, transform.position + normal * 2, Color.red);
+            float angle = Vector3.Dot(forward, Vector3.right);
+            wallAngle = angle;
+            wallForward = forward;
             //if (angle >= -0.01f)
             //{ 
             //    _controller.velocity = new Vector3 (wallForward.x, wallForward.y, _controller.velocity.z) * 10 * _controller.InputDir;
             //}
         }
+        else
+        {
+            wallAngle = 0;
+        }
     }
 
     private void RayDetector()
     {
-        rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis, ( 1 << 6));
-        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, ( 1 << 6));
+        rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis, (1 << 10 | 1 << 6));
+        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, (1 << 10 | 1 << 6));
         upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis, (1 << 10));
         downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDisDown, (1 << 10 | 1 << 6));
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDisDown, Color.red, 1);
-        Debug.DrawLine(transform.position, transform.position + Vector3.left * rayDis, Color.red, 1);
+        Debug.DrawLine(transform.position, transform.position + Vector3.right * rayDis, Color.red, 1);
     }
 
 

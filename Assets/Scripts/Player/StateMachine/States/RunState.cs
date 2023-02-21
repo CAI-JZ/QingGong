@@ -18,6 +18,7 @@ public class RunState : GroundedState
             _controller.SwitchState(_moveFactory.Idle());
         }
         CalculateWalk();
+        SlopeMove();
     }
 
 
@@ -42,7 +43,11 @@ public class RunState : GroundedState
 
     private void SlopeMove()
     {
-        
+        if(_controller.CanSlopeWalk)
+        {
+            _controller.currentVelX = _controller.WallForward.x * _controller.InputDir.x * 10;
+            _controller.velocity.y = _controller.WallForward.y * 10;
+        }
     }
 
 }

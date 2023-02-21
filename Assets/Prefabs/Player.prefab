@@ -111,8 +111,8 @@ TrailRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.78431374, g: 0.23529412, b: 0.13725491, a: 1}
-      key1: {r: 0.7830189, g: 0.5041048, b: 0.4542987, a: 0.75686276}
+      key0: {r: 0.6784314, g: 0.39607847, b: 0.38823533, a: 1}
+      key1: {r: 0.7725491, g: 0.5686275, b: 0.5764706, a: 0.75686276}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -241,24 +241,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _charMove: {fileID: 0}
-  maxSpeed: 8
+  maxSpeed: 12
   velocity: {x: 0, y: 0, z: 0}
-  moveAcceleration: 1200
-  deAcceleration: 1500
-  inputDir: 0
-  currentVelocityX: 0
+  moveAcceleration: 20
+  deAcceleration: 30
+  inputDir: {x: 0, y: 0}
+  currentVelX: 0
+  currentVelY: 0
   jumpHight: 25
   jumpApexThreshold: 10
   jumpEarlyMul: 5
   coyoteJump: 0.2
   jumpInputBuffer: 0.1
+  fallHorizontalMul: 20
   apexPoint: 0
+  dashPower: 18
+  deshAcceleration: 200
+  dashDeceleration: 15
   gravityClamp: -30
   minFallGravity: 80
   maxFallGraviyt: 120
   fallGravity: 0
   fallSpeed: 0
-  isControl: 1
+  useGravity: 0
+  isground: 0
 --- !u!114 &6402379329850656934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,6 +283,8 @@ MonoBehaviour:
   leftRay: 0
   upRay: 0
   downRay: 0
+  wallForward: {x: 0, y: 0, z: 0}
+  wallAngle: 0
   qiJumpPower: 50
   qiGraviytMul: 0.2
   canRecharge: 0
