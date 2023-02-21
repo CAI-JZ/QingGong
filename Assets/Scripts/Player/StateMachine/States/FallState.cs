@@ -2,16 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FallState : BaseState
+public class FallState : MovementBaseState
 {
-    private PlayerController _controller;
-    private MovementStateFactory _moveFactory;
-
-    public FallState(StateMachine stateMachine, StateFactory facotry) : base(stateMachine, facotry, "Fall")
-    {
-        _controller = (PlayerController)stateMachine;
-        _moveFactory = (MovementStateFactory)facotry;
-    }
+    public FallState(StateMachine stateMachine, StateFactory facotry) : base(stateMachine, facotry, "Fall") {}
 
     public override void Enter()
     {
@@ -22,10 +15,11 @@ public class FallState : BaseState
     public override void UpdateState()
     {
         base.UpdateState();
-        if (PlayerInput._instance.moveDir != Mathf.Epsilon && _controller.currentVelocityX == 0)
+        if (_controller.InputDir.x != 0 && _controller.currentVelX == 0)
         {
-            _controller.currentVelocityX += _controller.moveAcceleration * Time.deltaTime;
-            _controller.currentVelocityX = Mathf.Clamp(_controller.currentVelocityX, 0, _controller.MaxSpeed);
+            float dirMul = _controller.InputDir.x >= 0 ? _controller.FallHorizontalMul : _controller.FallHorizontalMul *-1f;
+            _controller.currentVelX += _controller.moveAcceleration * dirMul * Time.deltaTime;
+            _controller.currentVelX = Mathf.Clamp(_controller.currentVelX, _controller.MaxSpeed * -1, _controller.MaxSpeed);
         }
         if (_controller.IsGrounded)
         {
@@ -35,7 +29,11 @@ public class FallState : BaseState
         if (_controller.CanJump)
         {
             _controller.DebugLog("¥”fallState«–ªª");
-            //_controller.SwitchState(_moveFactory.Jump());
+            _controller.SwitchState(_moveFactory.Jump());
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            _controller.SwitchState(_moveFactory.Dash());
         }
     }
 

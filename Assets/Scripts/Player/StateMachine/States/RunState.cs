@@ -13,7 +13,7 @@ public class RunState : GroundedState
     public override void UpdateState()
     {
         base.UpdateState();
-        if (_controller.InputDir == 0 )
+        if (_controller.InputDir.x == 0 )
         {
             _controller.SwitchState(_moveFactory.Idle());
         }
@@ -29,9 +29,20 @@ public class RunState : GroundedState
     // speed acceleration when input
     private void CalculateWalk()
     {
-        // speed acceleration when input
-        _controller.currentVelocityX += _controller.moveAcceleration * Time.deltaTime;
-        _controller.currentVelocityX = Mathf.Clamp(_controller.currentVelocityX, 0, _controller.MaxSpeed);
+        if (_controller.InputDir.x == 0)
+        {
+            return;
+        }
+        float dirMul = _controller.InputDir.x > 0 ? 1 : -1;
+
+        //speed acceleration when input
+        _controller.currentVelX += _controller.moveAcceleration* dirMul * Time.deltaTime;
+        _controller.currentVelX = Mathf.Clamp(_controller.currentVelX, _controller.MaxSpeed *-1f, _controller.MaxSpeed);
+    }
+
+    private void SlopeMove()
+    {
+        
     }
 
 }

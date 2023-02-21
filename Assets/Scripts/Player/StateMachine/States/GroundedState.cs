@@ -1,16 +1,8 @@
 using UnityEngine;
 
-public class GroundedState : BaseState
+public class GroundedState : MovementBaseState
 {
-    protected PlayerController _controller;
-    protected MovementStateFactory _moveFactory;
-
-    public GroundedState(StateMachine stateMachine, StateFactory factory, string name) : base(stateMachine, factory, name)
-    {
-        _controller = (PlayerController)stateMachine;
-        _moveFactory = (MovementStateFactory)factory;
-    }
-
+    public GroundedState(StateMachine stateMachine, StateFactory factory,string name) : base(stateMachine, factory, name) {}
 
     public override void Enter()
     {
@@ -33,11 +25,11 @@ public class GroundedState : BaseState
             _controller.DebugLog("switch to Jump state");
         }
 
-        //if (!_controller.IsGrounded)
-        //{
-        //    _controller.DebugLog("ÏÂÂä");
-        //    _controller.SwitchState(_moveFactory.Fall());
-        //}
+        if (_controller.velocity.y < 0) 
+        {
+            _controller.DebugLog("ÏÂÂä");
+            _controller.SwitchState(_moveFactory.Fall());
+        }
     }
     public override void Exit()
     {

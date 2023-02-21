@@ -211,7 +211,7 @@ public class MovementController : MonoBehaviour
 
     public void InputDetector()
     {
-        moveDir = PlayerInput._instance.moveDir;
+        moveDir = PlayerInput._instance.HorizontalInput;
         jumpInputDown = PlayerInput._instance.jumpBtnDown;
         jumpInputUp = PlayerInput._instance.jumpBtnUp;
         //isQi = Input.GetKey(KeyCode.Mouse0);

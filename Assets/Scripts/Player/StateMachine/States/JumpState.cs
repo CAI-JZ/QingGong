@@ -1,15 +1,8 @@
 using UnityEngine;
 
-public class JumpState : BaseState
+public class JumpState : MovementBaseState
 {
-    private PlayerController _controller;
-    private MovementStateFactory _moveFactory;
-
-    public JumpState(StateMachine stateMachine, StateFactory factory) : base(stateMachine, factory, "Jump")
-    {
-        _controller = (PlayerController)stateMachine;
-        _moveFactory = (MovementStateFactory)factory;
-    }
+    public JumpState(StateMachine stateMachine, StateFactory factory) : base(stateMachine, factory, "Jump") {}
 
     public override void Enter()
     {
@@ -24,12 +17,6 @@ public class JumpState : BaseState
         {
             _controller.SwitchState(_moveFactory.Fall());
         }
-        //if (_controller.IsGrounded)
-        //{
-        //    BaseState newstate = _controller.velocity.x != 0 ? _moveFactory.Idle() : _moveFactory.Run();
-        //    _controller.SwitchState(newstate);
-        //}
-        
     }
 
 
@@ -38,8 +25,6 @@ public class JumpState : BaseState
         base.Enter();
         //when exit
         //stop animator;
-        //cool down jump
-
     }
 
     private void HandleJump()

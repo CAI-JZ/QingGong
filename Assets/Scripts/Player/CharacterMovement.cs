@@ -15,6 +15,8 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] public bool rightRay, leftRay, upRay, downRay;
     public RaycastHit rightInfo, leftInfo, upInfo, downInfo;
 
+    public bool canSlopeWalkOn;
+
     [Header("QI")]
     //qinggong
     [SerializeField] public float qiJumpPower = 40;
@@ -37,6 +39,7 @@ public class CharacterMovement : MonoBehaviour
     void Update()
     {
         RayDetector();
+        WallWalk();
     }
 
    
@@ -54,10 +57,11 @@ public class CharacterMovement : MonoBehaviour
             Debug.DrawLine(transform.position, transform.position + wallNormal * 2, Color.red);
             float angle = Vector3.Dot(wallForward, Vector3.right);
             Debug.Log(angle);
-            if (angle >= -0.01f)
-            { 
-                _controller.velocity = new Vector3 (wallForward.x, wallForward.y, _controller.velocity.z) * 10 * _controller.InputDir;
-            }
+            canSlopeWalkOn = angle > Mathf.Epsilon ? true : false;
+            //if (angle >= -0.01f)
+            //{ 
+            //    _controller.velocity = new Vector3 (wallForward.x, wallForward.y, _controller.velocity.z) * 10 * _controller.InputDir;
+            //}
         }
     }
 

@@ -13,9 +13,11 @@ public class PlayerInput : MonoBehaviour
 
     //PlayerInput
     private float _horizontalInput;
+    private float _verticalInput;
     private bool _jumpInputDown;
     private bool _jumpInputUp;
-    public float moveDir => _horizontalInput;
+    public float HorizontalInput => _horizontalInput;
+    public float VerticalInput => _verticalInput;
     public bool jumpBtnDown => _jumpInputDown;
     public bool jumpBtnUp => _jumpInputUp;
 
@@ -33,7 +35,8 @@ public class PlayerInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        _horizontalInput = Input.GetAxis("Horizontal");
+        _horizontalInput = Input.GetAxisRaw("Horizontal");
+        _verticalInput = Input.GetAxisRaw("Vertical");
         //_jumpInputDown = Input.GetKeyDown(jumpKey);
         //_jumpInputUp = Input.GetKeyUp(jumpKey);
         _jumpInputDown = Input.GetButtonDown("Jump");
