@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6372313647644730494}
   - component: {fileID: 740669149408854247}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6402379329267002878}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!96 &740669149408854247
 TrailRenderer:
@@ -156,7 +156,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6402379329267002878}
-  m_Layer: 0
+  - component: {fileID: 6113898133416680325}
+  m_Layer: 3
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -174,11 +175,24 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 6372313647644730494}
   - {fileID: 6402379330736625141}
+  - {fileID: 6372313647644730494}
   m_Father: {fileID: 6402379329850656935}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6113898133416680325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6402379329267002879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 287207aa34a43724399319615fb9bbab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _character: {fileID: 0}
 --- !u!1 &6402379329850656938
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,11 +202,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6402379329850656935}
-  - component: {fileID: 6402379329850656936}
   - component: {fileID: 6402379329850656937}
   - component: {fileID: 6402379329850656934}
   - component: {fileID: 6402379329850656933}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -214,20 +227,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &6402379329850656936
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6402379329850656938}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.25264513
-  m_Height: 1.7720708
-  m_Direction: 1
-  m_Center: {x: 0.13476574, y: 0.01639074, z: 0}
 --- !u!114 &6402379329850656937
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -241,10 +240,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _charMove: {fileID: 0}
+  _charSprite: {fileID: 6402379330736625140}
   maxSpeed: 12
   velocity: {x: 0, y: 0, z: 0}
-  moveAcceleration: 20
-  deAcceleration: 30
+  moveAcceleration: 100
+  deAcceleration: 120
   inputDir: {x: 0, y: 0}
   currentVelX: 0
   currentVelY: 0
@@ -277,7 +277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87e35b0e515b53347b4575e42078c006, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rayDis: 0.55
+  rayDis: 0.3
   rayDisDown: 1
   rightRay: 0
   leftRay: 0
@@ -285,6 +285,7 @@ MonoBehaviour:
   downRay: 0
   wallForward: {x: 0, y: 0, z: 0}
   wallAngle: 0
+  canSlpoeWalk: 0
   qiJumpPower: 50
   qiGraviytMul: 0.2
   canRecharge: 0
@@ -332,7 +333,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6402379330736625141}
   - component: {fileID: 6402379330736625140}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: CharaterSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -351,7 +352,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6402379329267002878}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6402379330736625140
 SpriteRenderer:

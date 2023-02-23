@@ -13,9 +13,13 @@ public class JumpState : MovementBaseState
     public override void UpdateState()
     {
         base.UpdateState();
-        if (_controller.velocity.y < 0)
+        if (_controller.currentVelY < 0)
         {
             _controller.SwitchState(_moveFactory.Fall());
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            _controller.SwitchState(_moveFactory.Dash());
         }
     }
 
@@ -29,7 +33,7 @@ public class JumpState : MovementBaseState
 
     private void HandleJump()
     {
-         _controller.velocity.y = _controller.JumpHight;
+         _controller.currentVelY = _controller.JumpHight;
          _controller.JumpInputBufferTimer = 0;
         
         if (_controller.CheckIsJumpEarly)

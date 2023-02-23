@@ -43,17 +43,15 @@ public class CharacterMovement : MonoBehaviour
         RayDetector();
         WallWalk();
         Physics.SyncTransforms();
-        canSlpoeWalk = rightRay && rightInfo.collider.tag == "Slope" || leftRay && leftInfo.collider.tag == "Slope";
     }
 
    
 
     private void WallWalk()
     {
-        if (rightRay && rightInfo.collider.tag == "Slope" || leftRay && leftInfo.collider.tag == "Slope")
+        if (downRay && downInfo.collider.tag == "Slope")
         {
-
-            Vector3 normal = rightRay ? rightInfo.normal : leftInfo.normal;
+            Vector3 normal = downInfo.normal;
             Vector3 forward = (Vector3.Cross(normal, Vector3.forward)).normalized;
             Debug.DrawLine(transform.position, transform.position + forward, Color.green);
             Debug.DrawLine(transform.position, transform.position + Vector3.right, Color.blue);

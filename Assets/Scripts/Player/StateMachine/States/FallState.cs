@@ -15,25 +15,31 @@ public class FallState : MovementBaseState
     public override void UpdateState()
     {
         base.UpdateState();
+        // Switch to Idle or Run depend on current speed;
+        if (_controller.IsGrounded)
+        {
+            BaseState newstate = _controller.currentVelY == 0 ? _moveFactory.Idle() : _moveFactory.Run();
+            _controller.SwitchState(newstate);
+        }
+
+        // Switch to Jump
+        if (_controller.CanJump)
+        {
+            _controller.SwitchState(_moveFactory.Jump());
+        }
+
+        // Switch to Dash;
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            _controller.SwitchState(_moveFactory.Dash());
+        }
+
+        // physic move, speed acceleration
         if (_controller.InputDir.x != 0 && _controller.currentVelX == 0)
         {
             float dirMul = _controller.InputDir.x >= 0 ? _controller.FallHorizontalMul : _controller.FallHorizontalMul *-1f;
             _controller.currentVelX += _controller.moveAcceleration * dirMul * Time.deltaTime;
             _controller.currentVelX = Mathf.Clamp(_controller.currentVelX, _controller.MaxSpeed * -1, _controller.MaxSpeed);
-        }
-        if (_controller.IsGrounded)
-        {
-            BaseState newstate = _controller.velocity.x == 0 ? _moveFactory.Idle() : _moveFactory.Run();
-            _controller.SwitchState(newstate);
-        }
-        if (_controller.CanJump)
-        {
-            _controller.DebugLog("¥”fallState«–ªª");
-            _controller.SwitchState(_moveFactory.Jump());
-        }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            _controller.SwitchState(_moveFactory.Dash());
         }
     }
 

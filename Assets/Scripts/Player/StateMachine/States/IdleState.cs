@@ -9,8 +9,6 @@ public class IdleState : GroundedState
     public override void Enter()
     {
         base.Enter();
-        _controller.DebugLog("Idle");
-        _controller.DebugLog("currentX: " + _controller.currentVelX.ToString());
     }
 
     public override void UpdateState()

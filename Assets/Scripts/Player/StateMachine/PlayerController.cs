@@ -7,15 +7,16 @@ public class PlayerController : StateMachine
     [Header("Reference")]
     private MovementStateFactory _moveFactory;
     public CharacterMovement _charMove;
+    [SerializeField]private SpriteRenderer _charSprite;
 
     [Header("Base Data")]
     [SerializeReference] private float maxSpeed;
-    [SerializeField]public Vector3 velocity; 
+    [SerializeField] private Vector3 velocity;
 
     [Header("Move")]
     public float moveAcceleration = 50f;
     public float deAcceleration = 50f;
-    [SerializeField]private Vector2 inputDir;
+    [SerializeField] private Vector2 inputDir;
     public float currentVelX;
     public float currentVelY;
 
@@ -43,11 +44,10 @@ public class PlayerController : StateMachine
     [SerializeField] private float maxFallGraviyt = 120f;
     private bool isJumpEarlyUp;
     [SerializeField] private float fallGravity;
-    [SerializeField]private float fallSpeed;
-    [SerializeField]private bool useGravity;
+    [SerializeField] private float fallSpeed;
+    [SerializeField] private bool useGravity;
 
-    private bool isControl ;
-    [SerializeField]private bool isground;
+    private bool isControl;
 
     public Vector2 InputDir => inputDir;
     public float MaxSpeed => maxSpeed;
@@ -57,13 +57,15 @@ public class PlayerController : StateMachine
     public float DashPower => dashPower;
     public float DashAcceleration => deshAcceleration;
     public float DashDeceleration => dashDeceleration;
+    public Collider GroundRef => _charMove.downInfo.collider;
+    public Vector3 Velocity => velocity;
     public bool UseGravity { get { return useGravity; } set { useGravity = value; } }
     public bool IsControllable { get { return isControl; } set { isControl = value; } }
     public bool IsJumpEarlyUp { get { return isJumpEarlyUp; } set { isJumpEarlyUp = value; } }
     public float CoyoteJumpTimer { get { return coyoteJumpTimer; } set { coyoteJumpTimer = value; } }
     public float JumpInputBufferTimer { get { return jumpInputBufferTimer; } set { jumpInputBufferTimer = value; } }
     public bool IsTouchWall => (velocity.x > 0 && _charMove.rightRay) || (velocity.x < 0 && _charMove.leftRay);
-    public bool IsGrounded => _charMove.downRay; //&& _charMove.downInfo.collider.tag == "Ground";
+    public bool IsGrounded => _charMove.downRay; 
     public bool CanJump => jumpInputBufferTimer > 0 && coyoteJumpTimer > 0;
     public bool CheckIsJumpEarly => !_charMove.downRay && jumpInputUp && velocity.y > 0;
     public bool CanSlopeWalk => _charMove.wallAngle > Mathf.Epsilon ? true : false;
@@ -80,17 +82,6 @@ public class PlayerController : StateMachine
     protected override void Start()
     {
         base.Start();
-        Vector2 a = Vector2.left;
-        Debug.Log("Left" + a);
-        a = Vector2.right;
-        Debug.Log("right" + a);
-        a = Vector2.up;
-        Debug.Log("up" + a);
-        a = Vector2.down;
-        Debug.Log("down" + a);
-        a = Vector2.up + Vector2.right;
-        Debug.Log("up+right" + a);
-
     }
 
     protected override void Update()
@@ -99,39 +90,37 @@ public class PlayerController : StateMachine
         CalculateJumpApex();
         base.Update();
         CalculateGravity();
-        isground = IsGrounded;
-        if (_charMove.wallAngle != 0)
-        { 
-            Debug.Log(_charMove.wallAngle);
-        }
         JumpOptimazation();
         CharacterMove();
-        CheckWall();   
+        Physics.SyncTransforms();
+        CheckWall();
+    }
+
+    private void FixedUpdate()
+    {
+        //CharacterMove();
+    }
+
+    private void SmoothlyVelocityChagne()
+    {
+
     }
 
     private void CharacterMove()
     {
-        if (!useGravity)
-        {
-            velocity.y = 0;
-        }
-        else if (!IsGrounded && useGravity)
-        {
-            velocity.y -= fallSpeed * Time.deltaTime;
-            if (velocity.y < gravityClamp) velocity.y = gravityClamp;
-        }
         if (isControl)
         {
             velocity.x = currentVelX;
+            velocity.y = currentVelY;
             transform.position += velocity * Time.deltaTime;
-        } 
+        }
     }
 
     private void CheckWall()
     {
         if (IsTouchWall)
         {
-            velocity.x = 0;
+            currentVelX = 0;
             SwitchState(_moveFactory.Idle());
         }
     }
@@ -152,6 +141,13 @@ public class PlayerController : StateMachine
 
     private void CalculateGravity()
     {
+        if (velocity.y < 0 && IsGrounded || !useGravity)
+        {
+                currentVelY = 0;
+                return;
+        }
+        else if (!IsGrounded && useGravity)
+        {
             if (CheckIsJumpEarly)
             {
                 fallSpeed = fallGravity * jumpEarlyMul;
@@ -161,12 +157,9 @@ public class PlayerController : StateMachine
             {
                 fallSpeed = fallGravity;
             }
-            if (velocity.y < 0 && IsGrounded)
-            {
-                velocity.y = 0;
-                return;
-            }
-
+            currentVelY -= fallSpeed * Time.deltaTime;
+            if (velocity.y < gravityClamp) velocity.y = gravityClamp;
+        }
     }
 
     private void JumpOptimazation()
