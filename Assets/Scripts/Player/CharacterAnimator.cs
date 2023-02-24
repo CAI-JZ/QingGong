@@ -6,6 +6,7 @@ public class CharacterAnimator : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private SpriteRenderer _character;
+    private PlayerController _controller;
 
     [Header("Input")]
     private float inputHorizontal;
@@ -13,29 +14,26 @@ public class CharacterAnimator : MonoBehaviour
     private void Awake()
     {
         _character = GetComponentInChildren<SpriteRenderer>();
+        _controller = GetComponentInParent<PlayerController>();
     }
 
     private void Update()
     {
-        InputDetactor();
         FlipSprite();
     }
 
     private void FlipSprite()
     {
         if (_character == null) return;
-        if (inputHorizontal < 0)
+        if (_controller.Velocity.x < 0)
         {
             _character.flipX = true;
         }
-        else if (inputHorizontal > 0)
+        else if (_controller.Velocity.x > 0)
         {
             _character.flipX = false;
         }
     }
 
-    private void InputDetactor()
-    {
-        inputHorizontal = PlayerInput._instance.HorizontalInput; 
-    }
+
 }

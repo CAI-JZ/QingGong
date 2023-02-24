@@ -33,6 +33,7 @@ public class JumpState : MovementBaseState
 
     private void HandleJump()
     {
+        Debug.Log("Handle Jump");
          _controller.currentVelY = _controller.JumpHight;
          _controller.JumpInputBufferTimer = 0;
         

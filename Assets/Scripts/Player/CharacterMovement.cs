@@ -12,12 +12,17 @@ public class CharacterMovement : MonoBehaviour
     //RayCast
     [SerializeField] private float rayDis = 1f;
     [SerializeField] private float rayDisDown = 1f;
-    [SerializeField] public bool rightRay, leftRay, upRay, downRay;
-    public RaycastHit rightInfo, leftInfo, upInfo, downInfo;
+    [SerializeField] private bool rightRay, leftRay, upRay, downRay;
+    public RaycastHit2D rightInfo, leftInfo, upInfo, downInfo;
 
     public Vector3 wallForward;
     public float wallAngle;
     public bool canSlpoeWalk;
+
+    public bool RightRay => rightInfo.collider != null;
+    public bool LeftRay => leftInfo.collider != null;
+    public bool UpRay => upInfo.collider != null;
+    public bool DownRay => downInfo.collider != null;
 
     [Header("QI")]
     //qinggong
@@ -49,7 +54,7 @@ public class CharacterMovement : MonoBehaviour
 
     private void WallWalk()
     {
-        if (downRay && downInfo.collider.tag == "Slope")
+        if (DownRay && downInfo.collider.tag == "Slope")
         {
             Vector3 normal = downInfo.normal;
             Vector3 forward = (Vector3.Cross(normal, Vector3.forward)).normalized;
@@ -73,10 +78,19 @@ public class CharacterMovement : MonoBehaviour
 
     private void RayDetector()
     {
-        rightRay = Physics.Raycast(transform.position, Vector3.right, out rightInfo, rayDis, (1 << 10 | 1 << 6));
-        leftRay = Physics.Raycast(transform.position, Vector3.left, out leftInfo, rayDis, (1 << 10 | 1 << 6));
-        upRay = Physics.Raycast(transform.position, Vector3.up, out upInfo, rayDis, (1 << 10));
-        downRay = Physics.Raycast(transform.position, Vector3.down, out downInfo, rayDisDown, (1 << 10 | 1 << 6));
+
+        rightInfo = Physics2D.Raycast(transform.position, Vector2.right, rayDis, (1 << 10 | 1 << 6));
+        leftInfo = Physics2D.Raycast(transform.position, Vector2.left, rayDis, (1 << 10 | 1 << 6));
+        upInfo = Physics2D.Raycast(transform.position, Vector2.up, rayDis, (1 << 10));
+        downInfo = Physics2D.Raycast(transform.position, Vector2.down, rayDisDown, (1 << 10));
+
+#if UNITY_EDITOR
+        rightRay= rightInfo.collider != null;
+        leftRay = leftInfo.collider != null;
+        upRay = upInfo.collider != null;
+        downRay = downInfo.collider != null;
+#endif
+
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDisDown, Color.red, 1);
         Debug.DrawLine(transform.position, transform.position + Vector3.right * rayDis, Color.red, 1);
     }

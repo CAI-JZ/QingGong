@@ -7,7 +7,6 @@ public class PlayerController : StateMachine
     [Header("Reference")]
     private MovementStateFactory _moveFactory;
     public CharacterMovement _charMove;
-    [SerializeField]private SpriteRenderer _charSprite;
 
     [Header("Base Data")]
     [SerializeReference] private float maxSpeed;
@@ -48,7 +47,7 @@ public class PlayerController : StateMachine
     [SerializeField] private bool useGravity;
 
     private bool isControl;
-
+    // variables;
     public Vector2 InputDir => inputDir;
     public float MaxSpeed => maxSpeed;
     public float JumpHight => jumpHight;
@@ -57,17 +56,20 @@ public class PlayerController : StateMachine
     public float DashPower => dashPower;
     public float DashAcceleration => deshAcceleration;
     public float DashDeceleration => dashDeceleration;
-    public Collider GroundRef => _charMove.downInfo.collider;
+    public Collider2D GroundRef => _charMove.downInfo.collider;
     public Vector3 Velocity => velocity;
     public bool UseGravity { get { return useGravity; } set { useGravity = value; } }
     public bool IsControllable { get { return isControl; } set { isControl = value; } }
     public bool IsJumpEarlyUp { get { return isJumpEarlyUp; } set { isJumpEarlyUp = value; } }
     public float CoyoteJumpTimer { get { return coyoteJumpTimer; } set { coyoteJumpTimer = value; } }
     public float JumpInputBufferTimer { get { return jumpInputBufferTimer; } set { jumpInputBufferTimer = value; } }
-    public bool IsTouchWall => (velocity.x > 0 && _charMove.rightRay) || (velocity.x < 0 && _charMove.leftRay);
-    public bool IsGrounded => _charMove.downRay; 
+    //
+    public bool IsTouchWall => (velocity.x > 0 && _charMove.RightRay) || (velocity.x < 0 && _charMove.LeftRay);
+    //public bool IsWallRun => (inputDir.x > 0 && _charMove.RightRay) || (inputDir.x < 0 && _charMove.LeftRay);
+    public RaycastHit2D WallRef => _charMove.RightRay ? _charMove.rightInfo : _charMove.leftInfo;
+    public bool IsGrounded => _charMove.DownRay; 
     public bool CanJump => jumpInputBufferTimer > 0 && coyoteJumpTimer > 0;
-    public bool CheckIsJumpEarly => !_charMove.downRay && jumpInputUp && velocity.y > 0;
+    public bool CheckIsJumpEarly => !_charMove.DownRay && jumpInputUp && velocity.y > 0;
     public bool CanSlopeWalk => _charMove.wallAngle > Mathf.Epsilon ? true : false;
     public Vector3 WallForward => _charMove.wallForward;
 
@@ -93,12 +95,7 @@ public class PlayerController : StateMachine
         JumpOptimazation();
         CharacterMove();
         Physics.SyncTransforms();
-        CheckWall();
-    }
-
-    private void FixedUpdate()
-    {
-        //CharacterMove();
+        //CheckWall();
     }
 
     private void SmoothlyVelocityChagne()
@@ -116,18 +113,18 @@ public class PlayerController : StateMachine
         }
     }
 
-    private void CheckWall()
-    {
-        if (IsTouchWall)
-        {
-            currentVelX = 0;
-            SwitchState(_moveFactory.Idle());
-        }
-    }
+    //private void CheckWall()
+    //{
+    //    if (IsTouchWall)
+    //    {
+    //        currentVelX = 0;
+    //        //SwitchState(_moveFactory.Idle());
+    //    }
+    //}
 
     private void CalculateJumpApex()
     {
-        if (!_charMove.downRay)
+        if (!_charMove.DownRay)
         {
             apexPoint = Mathf.InverseLerp(jumpApexThreshold, 0, Mathf.Abs(velocity.y));
             fallGravity = Mathf.Lerp(minFallGravity, maxFallGraviyt, apexPoint);
@@ -143,7 +140,7 @@ public class PlayerController : StateMachine
     {
         if (velocity.y < 0 && IsGrounded || !useGravity)
         {
-                currentVelY = 0;
+                fallSpeed  = 0;
                 return;
         }
         else if (!IsGrounded && useGravity)
@@ -157,9 +154,9 @@ public class PlayerController : StateMachine
             {
                 fallSpeed = fallGravity;
             }
-            currentVelY -= fallSpeed * Time.deltaTime;
-            if (velocity.y < gravityClamp) velocity.y = gravityClamp;
         }
+        currentVelY -= fallSpeed * Time.deltaTime;
+        if (velocity.y < gravityClamp) velocity.y = gravityClamp;
     }
 
     private void JumpOptimazation()

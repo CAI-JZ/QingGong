@@ -16,6 +16,10 @@ public class RunState : GroundedState
         {
             _controller.SwitchState(_moveFactory.Idle());
         }
+        if (_controller.IsTouchWall)
+        {
+            _controller.SwitchState(_moveFactory.WallRun());
+        }
         CalculateWalk();
         SlopeWalk();
     }
@@ -46,8 +50,7 @@ public class RunState : GroundedState
         {
             //return velocity vector3
             _controller.currentVelX = _controller.WallForward.x * _controller.InputDir.x * 10;
-            _controller.currentVelY = _controller.WallForward.y * _controller.InputDir.x * 10;
-           
+            _controller.currentVelY = _controller.WallForward.y * _controller.InputDir.x * 10;          
         }
     }
 

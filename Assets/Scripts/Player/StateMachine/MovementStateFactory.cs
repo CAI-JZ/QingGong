@@ -17,4 +17,5 @@ public class MovementStateFactory : StateFactory
     public BaseState Fall() { return new FallState(_controller, this); }
     public BaseState Dash() { return new DashState (_controller, this); }
     public BaseState WallRun() { return new WallRunState(_controller, this); }
+    public BaseState WallJump() { return new WallJumpState(_controller, this); }
 }
