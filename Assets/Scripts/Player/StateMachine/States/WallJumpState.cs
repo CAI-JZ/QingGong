@@ -6,15 +6,20 @@ public class WallJumpState : MovementBaseState
 {
     public WallJumpState(StateMachine stateMachine, StateFactory factory) : base(stateMachine, factory, "Wall Jump") { }
 
+    bool isWallJump;
+
     public override void Enter()
     {
         base.Enter();
+        isWallJump = true;
         HandleWallJump();
     }
 
     public override void UpdateState()
     {
         base.UpdateState();
+        if(!isWallJump)
+            _controller.SwitchState(_moveFactory.Jump());
     }
 
     public override void Exit()
@@ -28,6 +33,8 @@ public class WallJumpState : MovementBaseState
         //_controller.SwitchState(_moveFactory.Jump());
         _controller.currentVelX = wall.normal.x * _controller.MaxSpeed;
         Debug.Log("改了速度");
-        _controller.SwitchState(_moveFactory.Jump());
+        _controller.playerDir = _controller.playerDir == PlayerDir.Right ? PlayerDir.Left : PlayerDir.Right;
+        isWallJump = false;
+        
     }
 }

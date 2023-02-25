@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlayerDir
+{ 
+    Right,
+    Left,
+}
+
 public class PlayerController : StateMachine
 {
     [Header("Reference")]
@@ -11,6 +17,7 @@ public class PlayerController : StateMachine
     [Header("Base Data")]
     [SerializeReference] private float maxSpeed;
     [SerializeField] private Vector3 velocity;
+    public PlayerDir playerDir = PlayerDir.Right;
 
     [Header("Move")]
     public float moveAcceleration = 50f;
@@ -28,9 +35,7 @@ public class PlayerController : StateMachine
     [SerializeField] private float fallHorizontalMul = 10;
     private float coyoteJumpTimer;
     private float jumpInputBufferTimer;
-    private bool jumpInputDown;
-    private bool jumpInputUp;
-    [SerializeField] private float apexPoint;
+    private float apexPoint;
 
     [Header("Dash")]
     [SerializeField] private float dashPower;
@@ -41,12 +46,15 @@ public class PlayerController : StateMachine
     [SerializeField] private float gravityClamp = -30f;
     [SerializeField] private float minFallGravity = 80f;
     [SerializeField] private float maxFallGraviyt = 120f;
-    private bool isJumpEarlyUp;
     [SerializeField] private float fallGravity;
     [SerializeField] private float fallSpeed;
-    [SerializeField] private bool useGravity;
 
+    private bool jumpInputDown;
+    private bool jumpInputUp;
+    private bool useGravity;
+    private bool isJumpEarlyUp;
     private bool isControl;
+
     // variables;
     public Vector2 InputDir => inputDir;
     public float MaxSpeed => maxSpeed;
@@ -57,7 +65,6 @@ public class PlayerController : StateMachine
     public float DashAcceleration => deshAcceleration;
     public float DashDeceleration => dashDeceleration;
     public Collider2D GroundRef => _charMove.downInfo.collider;
-    public Vector3 Velocity => velocity;
     public bool UseGravity { get { return useGravity; } set { useGravity = value; } }
     public bool IsControllable { get { return isControl; } set { isControl = value; } }
     public bool IsJumpEarlyUp { get { return isJumpEarlyUp; } set { isJumpEarlyUp = value; } }
@@ -65,7 +72,6 @@ public class PlayerController : StateMachine
     public float JumpInputBufferTimer { get { return jumpInputBufferTimer; } set { jumpInputBufferTimer = value; } }
     //
     public bool IsTouchWall => (velocity.x > 0 && _charMove.RightRay) || (velocity.x < 0 && _charMove.LeftRay);
-    //public bool IsWallRun => (inputDir.x > 0 && _charMove.RightRay) || (inputDir.x < 0 && _charMove.LeftRay);
     public RaycastHit2D WallRef => _charMove.RightRay ? _charMove.rightInfo : _charMove.leftInfo;
     public bool IsGrounded => _charMove.DownRay; 
     public bool CanJump => jumpInputBufferTimer > 0 && coyoteJumpTimer > 0;
@@ -81,14 +87,30 @@ public class PlayerController : StateMachine
         useGravity = true;
     }
 
+    /// <summary>
+    /// Initialize Data
+    /// </summary>
     protected override void Start()
     {
         base.Start();
+    }
+    protected override BaseState GetInitialState()
+    {
+        if (_moveFactory == null)
+        {
+            Debug.LogError("moveFactory is null");
+            return null;
+        }
+        else
+        {
+            return _moveFactory.Idle();
+        }
     }
 
     protected override void Update()
     {
         InputDetector();
+        CheckPlayerDir();
         CalculateJumpApex();
         base.Update();
         CalculateGravity();
@@ -96,11 +118,6 @@ public class PlayerController : StateMachine
         CharacterMove();
         Physics.SyncTransforms();
         //CheckWall();
-    }
-
-    private void SmoothlyVelocityChagne()
-    {
-
     }
 
     private void CharacterMove()
@@ -112,16 +129,10 @@ public class PlayerController : StateMachine
             transform.position += velocity * Time.deltaTime;
         }
     }
-
-    //private void CheckWall()
-    //{
-    //    if (IsTouchWall)
-    //    {
-    //        currentVelX = 0;
-    //        //SwitchState(_moveFactory.Idle());
-    //    }
-    //}
-
+    
+    /// <summary>
+    /// Jump/Gravity Calculate
+    /// </summary>
     private void CalculateJumpApex()
     {
         if (!_charMove.DownRay)
@@ -133,7 +144,6 @@ public class PlayerController : StateMachine
         {
             apexPoint = 0;
         }
-
     }
 
     private void CalculateGravity()
@@ -161,6 +171,7 @@ public class PlayerController : StateMachine
 
     private void JumpOptimazation()
     {
+        //coyote Jump
         if (!IsGrounded)
         {
             coyoteJumpTimer -= Time.deltaTime;
@@ -177,19 +188,25 @@ public class PlayerController : StateMachine
             if (jumpInputBufferTimer < 0) jumpInputBufferTimer = 0;
         }
     }
-    protected override BaseState GetInitialState()
+
+    /// <summary>
+    /// Player sprite dir
+    /// </summary>
+    private void CheckPlayerDir()
     {
-        if (_moveFactory == null)
+        if (inputDir.x > 0)
         {
-            Debug.LogError("moveFactory is null");
-            return null;
+            playerDir = PlayerDir.Right;
         }
-        else
-        {   
-            return _moveFactory.Idle();
+        else if (inputDir.x < 0)
+        {
+            playerDir = PlayerDir.Left;
         }
     }
 
+    /// <summary>
+    /// Input
+    /// </summary>
     private void InputDetector()
     {
         inputDir.x = PlayerInput._instance.HorizontalInput;

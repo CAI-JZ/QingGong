@@ -13,9 +13,9 @@ public class DashState : MovementBaseState
     {
         base.Enter();
         _controller.UseGravity = false;
+        _controller.currentVelY = 0;
         //_controller.velocity = Vector3.zero;
-
-        dashDir = _controller.InputDir == Vector2.zero ? dashDir = Vector2.left : dashDir = _controller.InputDir;
+        CalculateDashDir();
         isDashing = true;
         accelerating = true;
 }
@@ -48,6 +48,19 @@ public class DashState : MovementBaseState
 
     }
 
+    private void CalculateDashDir()
+    {
+        if (_controller.InputDir != Vector2.zero)
+        {
+            dashDir = _controller.InputDir;
+        }
+        else
+        {
+            dashDir = _controller.playerDir == PlayerDir.Right ? Vector2.left : Vector2.right;
+        }
+        
+    }
+
     private void HandleDash()
     {
         if (Mathf.Abs(_controller.currentVelX) >= _controller.DashPower || Mathf.Abs(_controller.currentVelY) >= _controller.DashPower)
@@ -65,12 +78,8 @@ public class DashState : MovementBaseState
             _controller.currentVelY = Mathf.MoveTowards(_controller.currentVelY, 0, _controller.DashDeceleration * Time.deltaTime);
             if (Mathf.Abs(_controller.currentVelX) < _controller.DashPower /2 +3f)
             { 
-                _controller.UseGravity = true; 
-            }
-            if (_controller.Velocity == Vector3.zero)
-            {
+                _controller.UseGravity = true;
                 isDashing = false;
-                //_controller.UseGravity = true;
             }
         }
 

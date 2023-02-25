@@ -25,15 +25,7 @@ public class CharacterAnimator : MonoBehaviour
     private void FlipSprite()
     {
         if (_character == null) return;
-        if (_controller.Velocity.x < 0)
-        {
-            _character.flipX = true;
-        }
-        else if (_controller.Velocity.x > 0)
-        {
-            _character.flipX = false;
-        }
+        _character.flipX = _controller.playerDir == PlayerDir.Right ? false : true;
     }
-
 
 }
