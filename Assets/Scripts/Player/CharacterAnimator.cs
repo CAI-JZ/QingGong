@@ -7,6 +7,7 @@ public class CharacterAnimator : MonoBehaviour
     [Header("Reference")]
     [SerializeField] private SpriteRenderer _character;
     private PlayerController _controller;
+    private MovementController controller;
 
     [Header("Input")]
     private float inputHorizontal;
@@ -15,6 +16,7 @@ public class CharacterAnimator : MonoBehaviour
     {
         _character = GetComponentInChildren<SpriteRenderer>();
         _controller = GetComponentInParent<PlayerController>();
+        controller = GetComponentInParent<MovementController>();
     }
 
     private void Update()
@@ -25,7 +27,7 @@ public class CharacterAnimator : MonoBehaviour
     private void FlipSprite()
     {
         if (_character == null) return;
-        _character.flipX = _controller.playerDir == PlayerDir.Right ? false : true;
+        _character.flipX = controller.playerDir == CharDir.Right ? false : true;
     }
 
 }

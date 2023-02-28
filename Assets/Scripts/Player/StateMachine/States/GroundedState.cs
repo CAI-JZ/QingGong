@@ -11,12 +11,8 @@ public class GroundedState : MovementBaseState
         // set character on the ground;
         if (_controller.GroundRef != null)
         {
-            _controller.transform.position = (Vector3)_controller._charMove.downInfo.point + new Vector3(0, 0.9f, 0);
+            _controller.transform.position = (Vector3)_controller._charMove.Grounded.point + new Vector3(0, 0.9f, 0);
         }
-
-        // Reset Jump varibles;
-        _controller.IsJumpEarlyUp = false;
-        _controller.CoyoteJumpTimer = _controller.CoyoteJump;
     }
 
     public override void UpdateState()

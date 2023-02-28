@@ -4,33 +4,38 @@ using UnityEngine;
 
 public class WallRunState : MovementBaseState
 {
-    public WallRunState(StateMachine stateMachine, StateFactory factory) : base(stateMachine, factory, "Wall Run") {}
+    public WallRunState(StateMachine stateMachine, StateFactory factory) : base(stateMachine, factory, "Wall Run") { }
 
     public override void Enter()
     {
         base.Enter();
-        _controller.UseGravity = false;
+        _controller.ResetVelocity();
+        _controller.currentVelX = 0;
+        //_controller.UseGravity = false;
+
     }
 
     public override void UpdateState()
     {
         base.UpdateState();
-        //if (!_controller.IsTouchWall)
-        //{
-        //    _controller.SwitchState(_moveFactory.Idle());
-        //}
-        if (_controller.InputDir.x != 0)
+        if (CheckDistanceY() > -0.1f)
         {
-            HandleWallRun();
+            _controller.SwitchState(_moveFactory.Idle());
         }
-        else
+        if (_controller.InputDir.x == 0 || !_controller.CanWallRun)
         {
             _controller.SwitchState(_moveFactory.Fall());
         }
+   
         if (PlayerInput._instance.jumpBtnDown)
         {
             _controller.SwitchState(_moveFactory.WallJump());
         }
+        if (_controller.InputDir.x != 0 )
+        {
+            HandleWallRun();
+        }
+
         
     }
 
@@ -38,6 +43,7 @@ public class WallRunState : MovementBaseState
     {
         base.Exit();
         _controller.UseGravity = true;
+        //_controller.ResetVelocity();
     }
 
     private void HandleWallRun()
@@ -46,4 +52,22 @@ public class WallRunState : MovementBaseState
         _controller.currentVelX = 0;
 
     }
+
+    private float CheckDistanceY()
+    {
+        if (!_controller.WallRef)
+        {
+            return -999;
+        }
+        float checkPointY = _controller.WallRef.collider.transform.position.y + _controller.WallRef.collider.bounds.size.y / 2 + 0.2f;
+        float distanceY = _controller.transform.position.y - checkPointY;
+        return distanceY;
+    }
+
+    private void AutoJump() 
+    {
+            
+    }
+
+  
 }

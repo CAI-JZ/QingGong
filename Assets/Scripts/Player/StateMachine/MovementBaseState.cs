@@ -18,7 +18,7 @@ public class MovementBaseState : BaseState
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("进入:" + name);
+        //Debug.Log("进入:" + name);
     }
 
     public override void UpdateState()

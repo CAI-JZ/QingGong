@@ -14,7 +14,7 @@ public class IdleState : GroundedState
     public override void UpdateState()
     {
         base.UpdateState();
-        if (_controller.InputDir.x != 0)
+        if (_controller.InputDir.x != 0 && !_controller.RLTouched)
         {
             _controller.SwitchState(_moveFactory.Run());
         }

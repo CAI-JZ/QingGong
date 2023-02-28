@@ -18,7 +18,7 @@ public class FallState : MovementBaseState
         // Switch to Idle or Run depend on current speed;
         if (_controller.IsGrounded)
         {
-            BaseState newstate = _controller.currentVelY == 0 ? _moveFactory.Idle() : _moveFactory.Run();
+            BaseState newstate = _controller.currentVelX == 0 ? _moveFactory.Idle() : _moveFactory.Run();
             _controller.SwitchState(newstate);
         }
 

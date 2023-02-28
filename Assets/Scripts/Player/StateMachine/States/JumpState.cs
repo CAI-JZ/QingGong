@@ -1,8 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class JumpState : MovementBaseState
 {
-    public JumpState(StateMachine stateMachine, StateFactory factory) : base(stateMachine, factory, "Jump") {}
+    public JumpState(StateMachine stateMachine, StateFactory factory) : base(stateMachine, factory, "Jump") { }
 
     public override void Enter()
     {
@@ -17,16 +19,27 @@ public class JumpState : MovementBaseState
         {
             _controller.SwitchState(_moveFactory.Fall());
         }
+        if (_controller.CanWallRun)
+        {
+            _controller.SwitchState(_moveFactory.WallRun());
+        }
         if (Input.GetKeyDown(KeyCode.Q))
         {
             _controller.SwitchState(_moveFactory.Dash());
+        }
+
+        if (_controller.InputDir.x != 0 && _controller.currentVelX == 0)
+        {
+            float dirMul = _controller.InputDir.x >= 0 ? _controller.FallHorizontalMul : _controller.FallHorizontalMul * -1f;
+            _controller.currentVelX += _controller.moveAcceleration * dirMul * Time.deltaTime;
+            _controller.currentVelX = Mathf.Clamp(_controller.currentVelX, _controller.MaxSpeed * -1, _controller.MaxSpeed);
         }
     }
 
 
     public override void Exit()
     {
-        base.Enter();
+        base.Exit();
         //when exit
         //stop animator;
     }
@@ -34,14 +47,7 @@ public class JumpState : MovementBaseState
     private void HandleJump()
     {
         Debug.Log("Handle Jump");
-         _controller.currentVelY = _controller.JumpHight;
-         _controller.JumpInputBufferTimer = 0;
-        
-        if (_controller.CheckIsJumpEarly)
-        {
-            _controller.IsJumpEarlyUp = true;
-        }
+        _controller.currentVelY = _controller.JumpHight;
     }
-
 
 }

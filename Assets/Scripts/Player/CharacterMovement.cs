@@ -12,17 +12,11 @@ public class CharacterMovement : MonoBehaviour
     //RayCast
     [SerializeField] private float rayDis = 1f;
     [SerializeField] private float rayDisDown = 1f;
-    [SerializeField] private bool rightRay, leftRay, upRay, downRay;
-    public RaycastHit2D rightInfo, leftInfo, upInfo, downInfo;
+    [SerializeField ]public RaycastHit2D rightHit, leftHit, upHit, Grounded;
 
     public Vector3 wallForward;
     public float wallAngle;
     public bool canSlpoeWalk;
-
-    public bool RightRay => rightInfo.collider != null;
-    public bool LeftRay => leftInfo.collider != null;
-    public bool UpRay => upInfo.collider != null;
-    public bool DownRay => downInfo.collider != null;
 
     [Header("QI")]
     //qinggong
@@ -46,55 +40,47 @@ public class CharacterMovement : MonoBehaviour
     void Update()
     {
         RayDetector();
-        WallWalk();
+        //WallWalk();
         Physics.SyncTransforms();
     }
 
    
 
-    private void WallWalk()
-    {
-        if (DownRay && downInfo.collider.tag == "Slope")
-        {
-            Vector3 normal = downInfo.normal;
-            Vector3 forward = (Vector3.Cross(normal, Vector3.forward)).normalized;
-            Debug.DrawLine(transform.position, transform.position + forward, Color.green);
-            Debug.DrawLine(transform.position, transform.position + Vector3.right, Color.blue);
-            Debug.DrawLine(transform.position, transform.position + Vector3.forward * 2, Color.black);
-            Debug.DrawLine(transform.position, transform.position + normal * 2, Color.red);
-            float angle = Vector3.Dot(forward, Vector3.right);
-            wallAngle = angle;
-            wallForward = forward;
-            //if (angle >= -0.01f)
-            //{ 
-            //    _controller.velocity = new Vector3 (wallForward.x, wallForward.y, _controller.velocity.z) * 10 * _controller.InputDir;
-            //}
-        }
-        else
-        {
-            wallAngle = 0;
-        }
-    }
+    //private void WallWalk()
+    //{
+    //    if (Grounded && Grounded.collider.tag == "Slope")
+    //    {
+    //        Vector3 normal = Grounded.normal;
+    //        Vector3 forward = (Vector3.Cross(normal, Vector3.forward)).normalized;
+    //        //Debug.DrawLine(transform.position, transform.position + forward, Color.green);
+    //        //Debug.DrawLine(transform.position, transform.position + Vector3.right, Color.blue);
+    //        //Debug.DrawLine(transform.position, transform.position + Vector3.forward * 2, Color.black);
+    //        //Debug.DrawLine(transform.position, transform.position + normal * 2, Color.red);
+    //        float angle = Vector3.Dot(forward, Vector3.right);
+    //        wallAngle = angle;
+    //        wallForward = forward;
+    //        //if (angle >= -0.01f)
+    //        //{ 
+    //        //    _controller.velocity = new Vector3 (wallForward.x, wallForward.y, _controller.velocity.z) * 10 * _controller.InputDir;
+    //        //}
+    //    }
+    //    else
+    //    {
+    //        wallAngle = 0;
+    //    }
+    //}
 
     private void RayDetector()
     {
 
-        rightInfo = Physics2D.Raycast(transform.position, Vector2.right, rayDis, (1 << 10 | 1 << 6));
-        leftInfo = Physics2D.Raycast(transform.position, Vector2.left, rayDis, (1 << 10 | 1 << 6));
-        upInfo = Physics2D.Raycast(transform.position, Vector2.up, rayDis, (1 << 10));
-        downInfo = Physics2D.Raycast(transform.position, Vector2.down, rayDisDown, (1 << 10));
+        rightHit = Physics2D.Raycast(transform.position, Vector2.right, rayDis, (1 << 10 | 1 << 6));
+        leftHit = Physics2D.Raycast(transform.position, Vector2.left, rayDis, (1 << 10 | 1 << 6));
+        upHit = Physics2D.Raycast(transform.position, Vector2.up, rayDis, (1 << 10));
+        Grounded = Physics2D.Raycast(transform.position, Vector2.down, rayDisDown, (1 << 10 | 1 << 6));
 
-#if UNITY_EDITOR
-        rightRay= rightInfo.collider != null;
-        leftRay = leftInfo.collider != null;
-        upRay = upInfo.collider != null;
-        downRay = downInfo.collider != null;
-#endif
-
-        Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDisDown, Color.red, 1);
+        //Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDisDown, Color.red, 1);
         Debug.DrawLine(transform.position, transform.position + Vector3.right * rayDis, Color.red, 1);
     }
-
 
 
     //private void UseQinggong()

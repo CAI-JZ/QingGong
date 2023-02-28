@@ -12,16 +12,16 @@ public class RunState : GroundedState
     public override void UpdateState()
     {
         base.UpdateState();
-        if (_controller.InputDir.x == 0 )
+        if (_controller.InputDir.x == 0 || _controller.RLTouched && !_controller.CanSlopeWalk)
         {
             _controller.SwitchState(_moveFactory.Idle());
         }
-        if (_controller.IsTouchWall)
+        if (_controller.CanWallRun)
         {
             _controller.SwitchState(_moveFactory.WallRun());
         }
         CalculateWalk();
-        SlopeWalk();
+        //SlopeWalk();
     }
 
 
@@ -33,25 +33,17 @@ public class RunState : GroundedState
     // speed acceleration when input
     private void CalculateWalk()
     {
-        if (_controller.InputDir.x == 0)
-        {
-            return;
-        }
         float dirMul = _controller.InputDir.x > 0 ? 1 : -1;
+        
+        Vector2 runDir = _controller.CanSlopeWalk ? dirMul * (Vector2)_controller.WallForward : dirMul * Vector2.right;
 
-        //speed acceleration when input
-        _controller.currentVelX += _controller.moveAcceleration* dirMul * Time.deltaTime;
-        _controller.currentVelX = Mathf.Clamp(_controller.currentVelX, _controller.MaxSpeed *-1f, _controller.MaxSpeed);
+        _controller.currentVelX += runDir.x * _controller.moveAcceleration * Time.deltaTime;
+        //_controller.currentVelY += runDir.y * _controller.moveAcceleration * Time.deltaTime;
+        _controller.currentVelX = Mathf.Clamp(_controller.currentVelX, _controller.MaxSpeed * -1f, _controller.MaxSpeed);
+        //_controller.currentVelY = Mathf.Clamp(_controller.currentVelY, _controller.MaxSpeed * -1f, _controller.MaxSpeed);
+ 
     }
 
-    private void SlopeWalk()
-    {
-        if(_controller.CanSlopeWalk)
-        {
-            //return velocity vector3
-            _controller.currentVelX = _controller.WallForward.x * _controller.InputDir.x * 10;
-            _controller.currentVelY = _controller.WallForward.y * _controller.InputDir.x * 10;          
-        }
-    }
+    
 
 }

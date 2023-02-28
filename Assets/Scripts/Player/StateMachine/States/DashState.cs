@@ -18,7 +18,7 @@ public class DashState : MovementBaseState
         CalculateDashDir();
         isDashing = true;
         accelerating = true;
-}
+    }
 
     public override void UpdateState()
     {
@@ -58,9 +58,13 @@ public class DashState : MovementBaseState
         {
             dashDir = _controller.playerDir == PlayerDir.Right ? Vector2.left : Vector2.right;
         }
-        
+
     }
 
+    IEnumerator HandleDashing()
+    {
+        return null;
+    }
     private void HandleDash()
     {
         if (Mathf.Abs(_controller.currentVelX) >= _controller.DashPower || Mathf.Abs(_controller.currentVelY) >= _controller.DashPower)
