@@ -5,29 +5,24 @@ using UnityEngine;
 public class CharacterAnimator : MonoBehaviour
 {
     [Header("Reference")]
-    [SerializeField] private SpriteRenderer _character;
+    private SpriteRenderer _character;
     private PlayerController _controller;
-    private MovementController controller;
+    [SerializeField] private MovementController controller;
+    [SerializeField] private Animator _animator;
 
-    [Header("Input")]
-    private float inputHorizontal;
+    bool isRun;
 
     private void Awake()
     {
-        _character = GetComponentInChildren<SpriteRenderer>();
-        _controller = GetComponentInParent<PlayerController>();
         controller = GetComponentInParent<MovementController>();
+        _animator = GetComponentInChildren<Animator>();
     }
 
     private void Update()
     {
-        FlipSprite();
+        isRun = PlayerInput._instance.HorizontalInput != 0;
+        _animator.SetBool("isRun", isRun);
     }
 
-    private void FlipSprite()
-    {
-        if (_character == null) return;
-        _character.flipX = controller.playerDir == CharDir.Right ? false : true;
-    }
 
 }

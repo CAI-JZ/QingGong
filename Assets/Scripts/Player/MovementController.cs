@@ -13,8 +13,8 @@ public class MovementController : MonoBehaviour
     //Move
     [Header("BASIC DATA")]
     [SerializeField] Vector2 inputDir;
-    [SerializeField] Vector2 velocity;
-    private bool isControllable;
+    [SerializeField] private Vector2 velocity;
+   
     public CharDir playerDir = CharDir.Right;
     [SerializeField] private float currentSpeedX;
     [SerializeField] private float currentSpeedY;
@@ -34,14 +34,11 @@ public class MovementController : MonoBehaviour
     private bool isJumping;
 
     [Header("Wall Jump & Wall Slide")]
-    [SerializeField] private bool isWallSliding;
+    [SerializeField] public bool isWallSliding;
     [SerializeField] private float wallSlideSpeed = 2f;
     [SerializeField] private float wallJumpTime = 0.2f;
     private bool isWallJumping;
-    private float wallJumpDir;
-    
     [SerializeField]private float wallJumpTimer;
-    [SerializeField] private float wallJumpDuration = 0.4f;
     [SerializeField] private Vector2 wallJumpPower = new Vector2(8f, 16f);
 
     [Header("GRAVITY")]
@@ -62,10 +59,10 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float slopeCheckDis;
     [SerializeField] private float maxSlopeAngle;
     private Vector2 slopeNormalPerp;
-    private float slopeDownAngle;
+    [SerializeField]private float slopeDownAngle;
     private float slopeDownAngleOld;
     private float slopeSideAngle;
-    private bool isOnSlope;
+    [SerializeField]private bool isOnSlope;
     private bool canMoveOn;
 
     [Header("RAY")]
@@ -73,22 +70,45 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float rayDis = 0.5f;
     [SerializeField] private float rayDisDown = 1f;
     public RaycastHit2D rightHit, leftHit, upHit, downHit;
-    [SerializeField]bool Grounded;
-    [SerializeField] bool useGravity;
+
+    [Header("Player State")]
+    [SerializeField] private bool grounded;
+    [SerializeField] private bool useGravity;
+    [SerializeField] private bool isControllable;
+    [SerializeField] private bool isAlive;
+
+    bool isTouchWall => currentSpeedX > 0 && rightHit && !isOnSlope || currentSpeedX < 0 && leftHit && !isOnSlope;
+
+    // reference
+    public bool IsWallSliding => isWallSliding;
+    public bool IsWallJumping => isWallJumping;
+    public Vector2 Velocity => velocity;
+
 
     private void Awake()
     {
+        isAlive = true;
         isControllable = true;
         useGravity = true;
     }
 
     private void Update()
     {
+        if (!isAlive)
+        {
+            return;
+        }
+
         RayDetector();
-        Grounded = downHit;
+#if UNITY_EDITOR
+        grounded = downHit;
+#endif
         InputDetector();
         FlipPlayerDir();
-        
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            FlipDir();
+        }
 
         CalculateWalkSpeed();
         CalculateJumpApex();
@@ -102,19 +122,17 @@ public class MovementController : MonoBehaviour
         Physics2D.SyncTransforms();
     }
 
-    private void FixedUpdate()
-    {
-       
-    }
 
     private void CharacterMove()
     {
         HandleMove();
-        transform.position += (Vector3) velocity * Time.fixedDeltaTime;
+        transform.position += (Vector3) velocity * Time.deltaTime;
+        //transform.position += (Vector3)velocity * Time.fixedDeltaTime;
     }
 
     private void HandleMove()
     {
+        // slope walk
         if (downHit && isOnSlope && !isJumping && canMoveOn)
         {
             velocity = slopeNormalPerp * -currentSpeedX;
@@ -141,7 +159,7 @@ public class MovementController : MonoBehaviour
                 currentSpeedX = Mathf.MoveTowards(currentSpeedX, 0, deAcceleration * Time.deltaTime);
             }
             //check wall
-            if (currentSpeedX > 0 && rightHit || currentSpeedX < 0 && leftHit)
+            if (isTouchWall)
             {
                 currentSpeedX = 0;
             }
@@ -151,7 +169,7 @@ public class MovementController : MonoBehaviour
     /// <summary>
     /// Jump
     /// </summary>
-    #region Jump
+#region Jump
     private void CalculateJumpApex()
     {
         if (!downHit)
@@ -167,7 +185,7 @@ public class MovementController : MonoBehaviour
 
     private void Jump()
     {
-        if (isControllable && !isWallJumping)
+        if (isControllable && !isWallSliding)
         {
             if (jumpInputBufferTimer > 0.01f && coyoteJumpTimer > 0.01f )
             {
@@ -186,7 +204,7 @@ public class MovementController : MonoBehaviour
     private void JumpOptimation()
     {
         // coyote Jump
-        if (downHit)
+        if (downHit && downHit.collider.tag != "Wall")
         {
             coyoteJumpTimer = coyoteJump;
         }
@@ -245,12 +263,12 @@ public class MovementController : MonoBehaviour
 
         }
     }
-    #endregion
+#endregion
 
     /// <summary>
     /// Wall slide & Jump
     /// </summary>
-    #region wall
+#region wall
     private void WallEvent()
     {
         WallSlide();
@@ -258,29 +276,32 @@ public class MovementController : MonoBehaviour
     }
 
     bool isWalled => rightHit || leftHit;
-
+   
     private void WallSlide()
     {
-        if (isWalled && !downHit && inputDir.x != 0f)
+        isWallSliding = isWalled && !downHit && inputDir.x != 0f ? true : false;
+
+        if (isWallSliding)
         {
-            isWallSliding = true;
-            currentSpeedY = Mathf.Clamp(currentSpeedY, -wallSlideSpeed, float.MaxValue);
-        }
-        else
-        {
-            isWallSliding = false;
+            float normalDir = rightHit ? -1 : 1;
+            if (inputDir.x == normalDir)
+            {
+                return;
+            }
+
+            velocity = Vector3.zero;
+            currentSpeedX = 0;
+            currentSpeedY = Mathf.Clamp(currentSpeedY, wallSlideSpeed, float.MaxValue);
+            
         }
     }
 
     private void WallJump()
     {
-        if (isWallSliding)
+        if (isWallSliding && jumpInputDown)
         {
-            isWallJumping = false;
-            wallJumpDir = playerDir == CharDir.Right ? -1 : 1;
             wallJumpTimer = wallJumpTime;
-
-            CancelInvoke(nameof(StopWallJump));
+        
         }
         else
         {
@@ -288,29 +309,27 @@ public class MovementController : MonoBehaviour
             if (wallJumpTimer < 0) wallJumpTimer = -0.1f;
         }
 
-        if (jumpInputDown && wallJumpTimer > 0)
+        if (wallJumpTimer > 0)
         {
-            useGravity = false;
+            if (!isWalled) { return; }
+            float normal = rightHit ? rightHit.normal.x : leftHit.normal.x;
+            
+            if (inputDir.x * normal <0)
+            {
+                return;
+            }
             isWallJumping = true;
-            isControllable = false;
-            currentSpeedX = wallJumpDir * wallJumpPower.x;
-            currentSpeedY = wallJumpPower.y;
-            wallJumpTimer = -0.1f;
-
-            //flip();
+            isWallSliding = false;
+            currentSpeedX = Mathf.Lerp(currentSpeedX, inputDir.x * wallJumpPower.x, wallJumpPower.x / wallJumpTime);
+            currentSpeedY = Mathf.Lerp(currentSpeedY, wallJumpPower.y, wallJumpPower.y / wallJumpTime);
+            Debug.Log("Wall Jump");
         }
-
-        Invoke(nameof(StopWallJump), wallJumpDuration);
+        else
+        {
+            isWallJumping = false;
+        }      
     }
-    #endregion
-    
-    private void StopWallJump()
-    {
-        
-        isWallJumping = false;
-        useGravity = true;
-        isControllable = true;
-    }
+#endregion
 
 
     private void Dash()
@@ -321,7 +340,7 @@ public class MovementController : MonoBehaviour
     /// <summary>
     /// slope move
     /// </summary>
-    #region Slope
+#region Slope
     private void SlopeCheck()
     {
         SlopeCheckVertial();
@@ -379,14 +398,20 @@ public class MovementController : MonoBehaviour
 
     private void FlipPlayerDir()
     {
-        if (inputDir.x > 0)
+        if (velocity.x > 0)
         {
-            playerDir = CharDir.Right;
+            transform.localScale = new Vector3(1, 1, 1);
         }
-        else if (inputDir.x < 0)
+        else if (velocity.x < 0)
         {
-            playerDir = CharDir.Left;
+            transform.localScale = new Vector3(-1, 1, 1);
         }
+    }
+
+    private void FlipDir()
+    {
+        float dir = transform.localScale.x * -1;
+        transform.localScale = new Vector3(dir, 1, 1);
     }
 
 
@@ -395,10 +420,6 @@ public class MovementController : MonoBehaviour
     /// </summary>
     public void InputDetector()
     {
-        if (!isControllable)
-        {
-            return;
-        }
         inputDir.x = PlayerInput._instance.HorizontalInput;
         inputDir.y = PlayerInput._instance.VerticalInput;
         jumpInputDown = PlayerInput._instance.jumpBtnDown;
@@ -408,8 +429,8 @@ public class MovementController : MonoBehaviour
     private void RayDetector()
     {
 
-        rightHit = Physics2D.Raycast(transform.position, Vector2.right, rayDis, (1 << 6));
-        leftHit = Physics2D.Raycast(transform.position, Vector2.left, rayDis, (1 << 6));
+        rightHit = Physics2D.Raycast(transform.position, Vector2.right, rayDis, (1 << 6 | 1 << 10));
+        leftHit = Physics2D.Raycast(transform.position, Vector2.left, rayDis, (1 << 6 | 1 << 10));
         upHit = Physics2D.Raycast(transform.position, Vector2.up, rayDis, (1 << 10));
         downHit = Physics2D.Raycast(transform.position, Vector2.down, rayDisDown, (1 << 10 | 1 << 6));
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDisDown, Color.red, 1);

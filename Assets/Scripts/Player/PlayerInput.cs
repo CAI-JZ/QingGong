@@ -8,7 +8,8 @@ public class PlayerInput : MonoBehaviour
 
     //Input keycode
     [Header("Input Keycode")]
-    public KeyCode jumpKey = KeyCode.Escape;
+    [SerializeField]public KeyCode jumpKey = KeyCode.Escape;
+    //public button
     public KeyCode useQiKey;
 
     //PlayerInput
