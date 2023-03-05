@@ -4,11 +4,20 @@ using UnityEngine;
 
 public class TreeBranch : MonoBehaviour
 {
-    private void OnTriggerEnter2D(Collider2D collision)
+    Rigidbody2D rbTree;
+
+    private void Awake()
     {
-        if (collision.tag == "Player")
-        { 
-            //collision.gameObject.TryGetComponent(out IBorrow borrowable)
-        }
+        rbTree = GetComponent<Rigidbody2D>();
+    }
+
+    private void Update()
+    {
+        
+    }
+
+    private void TreeSwing()
+    { 
+        
     }
 }
