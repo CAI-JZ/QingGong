@@ -14,7 +14,7 @@ public class MovementController : MonoBehaviour
     [Header("BASIC DATA")]
     [SerializeField] Vector2 inputDir;
     [SerializeField] private Vector2 velocity;
-   
+
     public CharDir playerDir = CharDir.Right;
     [SerializeField] private float currentSpeedX;
     [SerializeField] private float currentSpeedY;
@@ -29,16 +29,27 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float coyoteJumpTimer;
     [SerializeField] private float jumpInputBufferTimer;
     [SerializeField] private bool jumpInputDown;
-    private bool jumpInputUp;
+
     private float apexPoint;
     private bool isJumping;
+    [SerializeField] private bool isRecharging;
+
+    [Header("Dash")]
+    private float dashPower;
+    private Vector2 dashDir;
+    private float dashTime = 0.3f;
+    private float dashTimer;
+    private bool isDashing;
+    [SerializeField] private float rechargeTime = 0.2f;
+    [SerializeField] private float rechargeTimer;
+    private bool jumpInputUp;
 
     [Header("Wall Jump & Wall Slide")]
     [SerializeField] public bool isWallSliding;
     [SerializeField] private float wallSlideSpeed = 2f;
     [SerializeField] private float wallJumpTime = 0.2f;
     private bool isWallJumping;
-    [SerializeField]private float wallJumpTimer;
+    [SerializeField] private float wallJumpTimer;
     [SerializeField] private Vector2 wallJumpPower = new Vector2(8f, 16f);
 
     [Header("GRAVITY")]
@@ -50,19 +61,19 @@ public class MovementController : MonoBehaviour
 
     //Moves
     [Header("MOVE")]
-    [SerializeField]public float moveAcceleration = 50f;
-    [SerializeField]public float deAcceleration = 50f;
-    [SerializeField]public float moveClamp = 13f;
+    [SerializeField] public float moveAcceleration = 50f;
+    [SerializeField] public float deAcceleration = 50f;
+    [SerializeField] public float moveClamp = 13f;
 
 
     [Header("SlopeMove")]
     [SerializeField] private float slopeCheckDis;
     [SerializeField] private float maxSlopeAngle;
     private Vector2 slopeNormalPerp;
-    [SerializeField]private float slopeDownAngle;
+    [SerializeField] private float slopeDownAngle;
     private float slopeDownAngleOld;
     private float slopeSideAngle;
-    [SerializeField]private bool isOnSlope;
+    [SerializeField] private bool isOnSlope;
     private bool canMoveOn;
 
     [Header("RAY")]
@@ -100,16 +111,17 @@ public class MovementController : MonoBehaviour
         }
 
         RayDetector();
-#if UNITY_EDITOR
-        grounded = downHit;
-#endif
         InputDetector();
         FlipPlayerDir();
+
+#if UNITY_EDITOR
+        grounded = downHit;
         if (Input.GetKeyDown(KeyCode.C))
         {
-            FlipDir();
+            //FlipDir();
+            Recharge();
         }
-
+#endif
         CalculateWalkSpeed();
         CalculateJumpApex();
         Gravity();
@@ -126,7 +138,7 @@ public class MovementController : MonoBehaviour
     private void CharacterMove()
     {
         HandleMove();
-        transform.position += (Vector3) velocity * Time.deltaTime;
+        transform.position += (Vector3)velocity * Time.deltaTime;
         //transform.position += (Vector3)velocity * Time.fixedDeltaTime;
     }
 
@@ -139,7 +151,7 @@ public class MovementController : MonoBehaviour
         }
         else
         {
-            velocity = new Vector2 (currentSpeedX, currentSpeedY);
+            velocity = new Vector2(currentSpeedX, currentSpeedY);
         }
     }
 
@@ -187,7 +199,7 @@ public class MovementController : MonoBehaviour
     {
         if (isControllable && !isWallSliding)
         {
-            if (jumpInputBufferTimer > 0.01f && coyoteJumpTimer > 0.01f )
+            if (jumpInputBufferTimer > 0.01f && coyoteJumpTimer > 0.01f || jumpInputBufferTimer > 0.01f && isRecharging)
             {
                 isJumping = true;
                 currentSpeedY = jumpHight;
@@ -200,6 +212,8 @@ public class MovementController : MonoBehaviour
 
         }
     }
+
+
 
     private void JumpOptimation()
     {
@@ -240,7 +254,7 @@ public class MovementController : MonoBehaviour
             if (currentSpeedY < 0)
             {
                 currentSpeedY = 0;
-                
+
                 transform.position = (Vector3)downHit.point + new Vector3(0, 0.9f, 0);
                 isJumpEarlyUp = false;
             }
@@ -263,7 +277,46 @@ public class MovementController : MonoBehaviour
 
         }
     }
-#endregion
+    #endregion
+
+    private void Dash()
+    {
+        dashTimer = dashTime;
+    }
+
+    IEnumerator Dashing()
+    {
+        isDashing = true;
+        while (dashTimer >0)
+        {
+            dashTimer -= Time.deltaTime;
+            yield return null;
+        }
+        dashTimer = -0.1f;
+
+        isDashing = false;
+    }
+
+    private void Recharge()
+    {
+        rechargeTimer = rechargeTime;
+        isRecharging = true;
+        StopCoroutine(RechargeWindow());
+        StartCoroutine(RechargeWindow());
+    }
+
+    private IEnumerator RechargeWindow()
+    {
+        while (rechargeTimer > 0)
+        {
+            rechargeTimer -= Time.deltaTime;
+            yield return null;
+        }
+        rechargeTimer = -0.1f;
+        isRecharging = false;
+    }
+
+
 
     /// <summary>
     /// Wall slide & Jump
@@ -331,14 +384,8 @@ public class MovementController : MonoBehaviour
     }
 #endregion
 
-
-    private void Dash()
-    {
-
-    }
-
     /// <summary>
-    /// slope move
+    /// slope move 这里要改，改成按住一个方向键，就可以左右反复横跳，如果没有按，只会给一个后推力。
     /// </summary>
 #region Slope
     private void SlopeCheck()
@@ -437,4 +484,6 @@ public class MovementController : MonoBehaviour
         Debug.DrawLine(transform.position, transform.position + Vector3.right * rayDis, Color.red, 1);
        
     }
+
+ 
 }
