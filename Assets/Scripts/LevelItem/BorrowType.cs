@@ -6,7 +6,7 @@ public enum BorrowableType
 {
     Defult,
     Platform,
-    Wall,
+    Tree,
     Bamboo,
     Water,
     Grass

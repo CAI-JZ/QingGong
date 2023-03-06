@@ -48,6 +48,8 @@ public class MovementController : MonoBehaviour
     [SerializeField] public bool isWallSliding;
     [SerializeField] private float wallSlideSpeed = 2f;
     [SerializeField] private float wallJumpTime = 0.2f;
+    [SerializeField] private float wallJumpWindow = 0.1f;
+    [SerializeField] private float wallJumpWindowTimer;
     private bool isWallJumping;
     [SerializeField] private float wallJumpTimer;
     [SerializeField] private Vector2 wallJumpPower = new Vector2(8f, 16f);
@@ -87,6 +89,7 @@ public class MovementController : MonoBehaviour
     [SerializeField] private bool useGravity;
     [SerializeField] private bool isControllable;
     [SerializeField] private bool isAlive;
+    [SerializeField] private bool canInput;
 
     bool isTouchWall => currentSpeedX > 0 && rightHit && !isOnSlope || currentSpeedX < 0 && leftHit && !isOnSlope;
 
@@ -100,6 +103,7 @@ public class MovementController : MonoBehaviour
     {
         isAlive = true;
         isControllable = true;
+        canInput = true;
         useGravity = true;
     }
 
@@ -157,7 +161,7 @@ public class MovementController : MonoBehaviour
 
     private void CalculateWalkSpeed()
     {
-        if (isControllable)
+        if (isControllable && !isWallJumping)
         {
             if (inputDir.x != 0)
             {
@@ -258,6 +262,8 @@ public class MovementController : MonoBehaviour
                 transform.position = (Vector3)downHit.point + new Vector3(0, 0.9f, 0);
                 isJumpEarlyUp = false;
             }
+
+
             return;
         }
         else
@@ -274,7 +280,6 @@ public class MovementController : MonoBehaviour
             }
             currentSpeedY -= fallspeed * Time.deltaTime;
             if (currentSpeedY < gravityClamp) currentSpeedY = gravityClamp;
-
         }
     }
     #endregion
@@ -336,6 +341,7 @@ public class MovementController : MonoBehaviour
 
         if (isWallSliding)
         {
+            wallJumpWindowTimer = wallJumpWindow;
             float normalDir = rightHit ? -1 : 1;
             if (inputDir.x == normalDir)
             {
@@ -345,16 +351,19 @@ public class MovementController : MonoBehaviour
             velocity = Vector3.zero;
             currentSpeedX = 0;
             currentSpeedY = Mathf.Clamp(currentSpeedY, wallSlideSpeed, float.MaxValue);
-            
+        }
+        else
+        {
+            wallJumpWindowTimer -= Time.deltaTime;
+            if (wallJumpWindowTimer < 0) wallJumpWindowTimer = -0.1f;
         }
     }
 
     private void WallJump()
     {
-        if (isWallSliding && jumpInputDown)
+        if (isWallSliding && jumpInputDown && wallJumpWindowTimer>0)
         {
             wallJumpTimer = wallJumpTime;
-        
         }
         else
         {
@@ -366,14 +375,10 @@ public class MovementController : MonoBehaviour
         {
             if (!isWalled) { return; }
             float normal = rightHit ? rightHit.normal.x : leftHit.normal.x;
-            
-            if (inputDir.x * normal <0)
-            {
-                return;
-            }
+
             isWallJumping = true;
             isWallSliding = false;
-            currentSpeedX = Mathf.Lerp(currentSpeedX, inputDir.x * wallJumpPower.x, wallJumpPower.x / wallJumpTime);
+            currentSpeedX = Mathf.Lerp(currentSpeedX, normal * wallJumpPower.x, wallJumpPower.x / wallJumpTime);
             currentSpeedY = Mathf.Lerp(currentSpeedY, wallJumpPower.y, wallJumpPower.y / wallJumpTime);
             Debug.Log("Wall Jump");
         }
@@ -467,6 +472,10 @@ public class MovementController : MonoBehaviour
     /// </summary>
     public void InputDetector()
     {
+        if (!canInput)
+        {
+            return;
+        }
         inputDir.x = PlayerInput._instance.HorizontalInput;
         inputDir.y = PlayerInput._instance.VerticalInput;
         jumpInputDown = PlayerInput._instance.jumpBtnDown;

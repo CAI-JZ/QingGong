@@ -4,6 +4,9 @@ using UnityEngine;
 
 public interface IBorrow
 {
-    public void RechargeQi();
+    public void BorrowPower();
+    public void Swing();
+    public void Deform();
+    public void StopDeform();
     public BorrowableType GetBorrowableType();
 }

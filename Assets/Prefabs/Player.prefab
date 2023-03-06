@@ -156,7 +156,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7319303508556365077}
-  - component: {fileID: 1897481429}
   m_Layer: 3
   m_Name: ClothPoint
   m_TagString: Untagged
@@ -178,27 +177,6 @@ Transform:
   m_Father: {fileID: 6402379329850656935}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!50 &1897481429
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2998498162003392562}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
 --- !u!1 &6402379329267002879
 GameObject:
   m_ObjectHideFlags: 0
@@ -244,7 +222,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 287207aa34a43724399319615fb9bbab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _character: {fileID: 0}
+  controller: {fileID: 0}
+  _animator: {fileID: 0}
 --- !u!1 &6402379329850656938
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,11 +349,13 @@ MonoBehaviour:
   coyoteJumpTimer: 0
   jumpInputBufferTimer: 0
   jumpInputDown: 0
+  isRecharging: 0
+  rechargeTime: 0.2
+  rechargeTimer: 0
   isWallSliding: 0
   wallSlideSpeed: 8
   wallJumpTime: 0.2
   wallJumpTimer: 0
-  wallJumpDuration: 0.2
   wallJumpPower: {x: 8, y: 15}
   gravityClamp: -30
   minFallGravity: 80
@@ -389,8 +370,10 @@ MonoBehaviour:
   isOnSlope: 0
   rayDis: 0.8
   rayDisDown: 1
-  Grounded: 0
+  grounded: 0
   useGravity: 0
+  isControllable: 0
+  isAlive: 0
 --- !u!70 &302496640
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
