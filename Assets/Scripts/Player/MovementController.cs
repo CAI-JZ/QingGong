@@ -71,7 +71,7 @@ public class MovementController : MonoBehaviour
     [Header("SlopeMove")]
     [SerializeField] private float slopeCheckDis;
     [SerializeField] private float maxSlopeAngle;
-    private Vector2 slopeNormalPerp;
+    private Vector2 slopeNormalDir;
     [SerializeField] private float slopeDownAngle;
     private float slopeDownAngleOld;
     private float slopeSideAngle;
@@ -143,7 +143,6 @@ public class MovementController : MonoBehaviour
     {
         HandleMove();
         transform.position += (Vector3)velocity * Time.deltaTime;
-        //transform.position += (Vector3)velocity * Time.fixedDeltaTime;
     }
 
     private void HandleMove()
@@ -151,7 +150,7 @@ public class MovementController : MonoBehaviour
         // slope walk
         if (downHit && isOnSlope && !isJumping && canMoveOn)
         {
-            velocity = slopeNormalPerp * -currentSpeedX;
+            velocity = slopeNormalDir * -currentSpeedX;
         }
         else
         {
@@ -203,7 +202,7 @@ public class MovementController : MonoBehaviour
     {
         if (isControllable && !isWallSliding)
         {
-            if (jumpInputBufferTimer > 0.01f && coyoteJumpTimer > 0.01f || jumpInputBufferTimer > 0.01f && isRecharging)
+            if (jumpInputBufferTimer > 0.01f && coyoteJumpTimer > 0.01f )
             {
                 isJumping = true;
                 currentSpeedY = jumpHight;
@@ -262,8 +261,6 @@ public class MovementController : MonoBehaviour
                 transform.position = (Vector3)downHit.point + new Vector3(0, 0.9f, 0);
                 isJumpEarlyUp = false;
             }
-
-
             return;
         }
         else
@@ -341,6 +338,7 @@ public class MovementController : MonoBehaviour
 
         if (isWallSliding)
         {
+            Debug.Log("Œ“≈ˆµΩ¡À£°");
             wallJumpWindowTimer = wallJumpWindow;
             float normalDir = rightHit ? -1 : 1;
             if (inputDir.x == normalDir)
@@ -423,10 +421,10 @@ public class MovementController : MonoBehaviour
 
         if (hit&& hit.collider.tag == "Slope")
         {
-            Debug.DrawRay(hit.point, slopeNormalPerp, Color.red);
+            Debug.DrawRay(hit.point, slopeNormalDir, Color.red);
             Debug.DrawRay(hit.point, hit.normal, Color.green);
 
-            slopeNormalPerp = Vector2.Perpendicular(hit.normal).normalized;
+            slopeNormalDir = Vector2.Perpendicular(hit.normal).normalized;
             slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
             isOnSlope = true;
             //if (slopeDownAngle != slopeDownAngleOld)
