@@ -14,10 +14,9 @@ public class MovementController : MonoBehaviour
     [Header("BASIC DATA")]
     [SerializeField] Vector2 inputDir;
     [SerializeField] private Vector2 velocity;
-
-    public CharDir playerDir = CharDir.Right;
     [SerializeField] private float currentSpeedX;
     [SerializeField] private float currentSpeedY;
+    public CharDir playerDir = CharDir.Right;
 
     [Header("JUMP")]
     //Character Basic data
@@ -28,38 +27,32 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float jumpInputBuffer = 0.2f;
     [SerializeField] private float coyoteJumpTimer;
     [SerializeField] private float jumpInputBufferTimer;
-    [SerializeField] private bool jumpInputDown;
-
     private float apexPoint;
     private bool isJumping;
-    [SerializeField] private bool isRecharging;
 
-    [Header("Dash")]
-    private float dashPower;
-    private Vector2 dashDir;
-    private float dashTime = 0.3f;
-    private float dashTimer;
-    private bool isDashing;
+    [Header("DASH")]
+    [SerializeField] private Vector2 dashDir;
+    [SerializeField] private float dashTime = 0.3f;
+    [SerializeField] private bool isDashing;
+    [SerializeField] private bool canDash;
     [SerializeField] private float rechargeTime = 0.2f;
-    [SerializeField] private float rechargeTimer;
-    private bool jumpInputUp;
-
+    
     [Header("Wall Jump & Wall Slide")]
     [SerializeField] public bool isWallSliding;
     [SerializeField] private float wallSlideSpeed = 2f;
     [SerializeField] private float wallJumpTime = 0.2f;
     [SerializeField] private float wallJumpWindow = 0.1f;
-    [SerializeField] private float wallJumpWindowTimer;
-    private bool isWallJumping;
-    [SerializeField] private float wallJumpTimer;
     [SerializeField] private Vector2 wallJumpPower = new Vector2(8f, 16f);
+    private float wallJumpWindowTimer;
+    private bool isWallJumping;
+    private float wallJumpTimer;
 
     [Header("GRAVITY")]
     [SerializeField] private float gravityClamp = -30f;
     [SerializeField] private float minFallGravity = 80f;
     [SerializeField] private float maxFallGraviyt = 120f;
-    private bool isJumpEarlyUp;
     [SerializeField] public float fallGravity;
+    private bool isJumpEarlyUp;
 
     //Moves
     [Header("MOVE")]
@@ -67,22 +60,23 @@ public class MovementController : MonoBehaviour
     [SerializeField] public float deAcceleration = 50f;
     [SerializeField] public float moveClamp = 13f;
 
-
     [Header("SlopeMove")]
     [SerializeField] private float slopeCheckDis;
     [SerializeField] private float maxSlopeAngle;
     private Vector2 slopeNormalDir;
     [SerializeField] private float slopeDownAngle;
-    private float slopeDownAngleOld;
-    private float slopeSideAngle;
     [SerializeField] private bool isOnSlope;
     private bool canMoveOn;
+    private float slopeDownAngleOld;
+    private float slopeSideAngle;
 
     [Header("RAY")]
     //RayCast
     [SerializeField] private float rayDis = 0.5f;
     [SerializeField] private float rayDisDown = 1f;
-    public RaycastHit2D rightHit, leftHit, upHit, downHit;
+    [SerializeField] private float interactDecDis = 0.8f;
+    private RaycastHit2D rightHit, leftHit, upHit, downHit;
+    private RaycastHit2D interacte;
 
     [Header("Player State")]
     [SerializeField] private bool grounded;
@@ -90,6 +84,10 @@ public class MovementController : MonoBehaviour
     [SerializeField] private bool isControllable;
     [SerializeField] private bool isAlive;
     [SerializeField] private bool canInput;
+
+    //Input
+    private bool jumpInputUp;
+    private bool jumpInputDown;
 
     bool isTouchWall => currentSpeedX > 0 && rightHit && !isOnSlope || currentSpeedX < 0 && leftHit && !isOnSlope;
 
@@ -105,6 +103,7 @@ public class MovementController : MonoBehaviour
         isControllable = true;
         canInput = true;
         useGravity = true;
+        canDash = true;
     }
 
     private void Update()
@@ -120,10 +119,11 @@ public class MovementController : MonoBehaviour
 
 #if UNITY_EDITOR
         grounded = downHit;
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             //FlipDir();
-            Recharge();
+            //Recharge();
+            Dash();
         }
 #endif
         CalculateWalkSpeed();
@@ -160,7 +160,7 @@ public class MovementController : MonoBehaviour
 
     private void CalculateWalkSpeed()
     {
-        if (isControllable && !isWallJumping)
+        if (isControllable && !isWallJumping && !isDashing)
         {
             if (inputDir.x != 0)
             {
@@ -200,7 +200,7 @@ public class MovementController : MonoBehaviour
 
     private void Jump()
     {
-        if (isControllable && !isWallSliding)
+        if (isControllable && !isWallSliding && !isDashing)
         {
             if (jumpInputBufferTimer > 0.01f && coyoteJumpTimer > 0.01f )
             {
@@ -215,8 +215,6 @@ public class MovementController : MonoBehaviour
 
         }
     }
-
-
 
     private void JumpOptimation()
     {
@@ -254,6 +252,7 @@ public class MovementController : MonoBehaviour
         }
         if (downHit)
         {
+            canDash = true;
             if (currentSpeedY < 0)
             {
                 currentSpeedY = 0;
@@ -281,49 +280,50 @@ public class MovementController : MonoBehaviour
     }
     #endregion
 
+    #region DASH
     private void Dash()
     {
-        dashTimer = dashTime;
+        if (canDash)
+        {
+            float dirX = inputDir.x != 0 ? inputDir.x : transform.localScale.x;
+            float dirY = inputDir.x != 0 ? 1 : 0;
+            StartCoroutine(Dashing(dirX,dirY));
+        }       
     }
 
-    IEnumerator Dashing()
+    IEnumerator Dashing(float dirX, float dirY)
     {
         isDashing = true;
-        while (dashTimer >0)
-        {
-            dashTimer -= Time.deltaTime;
-            yield return null;
-        }
-        dashTimer = -0.1f;
+        useGravity = false;
+        currentSpeedX = dirX * dashDir.x;
+        currentSpeedY = dirY * dashDir.y;
+        yield return new WaitForSeconds(dashTime);
 
+        canDash = false;
+        useGravity = true;
         isDashing = false;
     }
 
-    private void Recharge()
+    public void RechargeWindow()
     {
-        rechargeTimer = rechargeTime;
-        isRecharging = true;
-        StopCoroutine(RechargeWindow());
-        StartCoroutine(RechargeWindow());
+        Debug.Log("Recharge");
+        StopCoroutine(WindowCounter());
+        StartCoroutine(WindowCounter());
     }
 
-    private IEnumerator RechargeWindow()
+    private IEnumerator WindowCounter()
     {
-        while (rechargeTimer > 0)
-        {
-            rechargeTimer -= Time.deltaTime;
-            yield return null;
-        }
-        rechargeTimer = -0.1f;
-        isRecharging = false;
+        canDash = true;
+        yield return new WaitForSeconds(rechargeTime);
+        canDash = false;
+        
     }
-
-
+    #endregion
 
     /// <summary>
     /// Wall slide & Jump
     /// </summary>
-#region wall
+    #region WALL
     private void WallEvent()
     {
         WallSlide();
@@ -489,6 +489,8 @@ public class MovementController : MonoBehaviour
         downHit = Physics2D.Raycast(transform.position, Vector2.down, rayDisDown, (1 << 10 | 1 << 6));
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDisDown, Color.red, 1);
         Debug.DrawLine(transform.position, transform.position + Vector3.right * rayDis, Color.red, 1);
+
+        //interacte = Physics2D.Raycast(transform.position, Vector2.right, interactDecDis, (1 << 8));
        
     }
 
