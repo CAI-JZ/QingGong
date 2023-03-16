@@ -17,10 +17,13 @@ public class PlayerInput : MonoBehaviour
     private float _verticalInput;
     private bool _jumpInputDown;
     private bool _jumpInputUp;
+    private bool _dash;
+
     public float HorizontalInput => _horizontalInput;
     public float VerticalInput => _verticalInput;
     public bool jumpBtnDown => _jumpInputDown;
     public bool jumpBtnUp => _jumpInputUp;
+    public bool Dash => _dash;
 
     private void Awake()
     {
@@ -42,6 +45,12 @@ public class PlayerInput : MonoBehaviour
         //_jumpInputUp = Input.GetKeyUp(jumpKey);
         _jumpInputDown = Input.GetButtonDown("Jump");
         _jumpInputUp = Input.GetButtonUp("Jump");
+        _dash = Input.GetButtonDown("Dash");
+
+        if (_dash)
+        {
+            Debug.Log("Dash");
+        }
 
     }
 }

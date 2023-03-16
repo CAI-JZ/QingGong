@@ -45,7 +45,7 @@ public class TreeBranch : MonoBehaviour//,IBorrow
             {
                 return true;
             }
-            Debug.Log("¼ì²âµ½Player:" + dis);
+            //Debug.Log("¼ì²âµ½Player:" + dis);
         }
         return false;
     }

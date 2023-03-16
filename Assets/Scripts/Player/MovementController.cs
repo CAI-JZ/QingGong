@@ -21,6 +21,7 @@ public class MovementController : MonoBehaviour
     [Header("JUMP")]
     //Character Basic data
     [SerializeField] private float jumpHight = 30f;
+    [SerializeField] private float doubleJumpHight = 10f;
     [SerializeField] private float jumpApexThreshold = 10f;
     [SerializeField] private float jumpEarlyMul = 3f;
     [SerializeField] private float coyoteJump = 0.2f;
@@ -29,6 +30,8 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float jumpInputBufferTimer;
     private float apexPoint;
     private bool isJumping;
+    private bool canDoubleJump;
+    [SerializeField] private AudioSource jumpSound;
 
     [Header("DASH")]
     [SerializeField] private Vector2 dashDir;
@@ -130,6 +133,7 @@ public class MovementController : MonoBehaviour
         CalculateJumpApex();
         Gravity();
         JumpOptimation();
+        Dash();
 
         SlopeCheck();
         Jump();
@@ -200,28 +204,51 @@ public class MovementController : MonoBehaviour
 
     private void Jump()
     {
-        if (isControllable && !isWallSliding && !isDashing)
+        if (isControllable && !isWallSliding)
         {
-            if (jumpInputBufferTimer > 0.01f && coyoteJumpTimer > 0.01f )
+            if (!isDashing)
             {
-                isJumping = true;
-                currentSpeedY = jumpHight;
-                jumpInputBufferTimer = -0.1f;
+                if (jumpInputBufferTimer > 0.01f && coyoteJumpTimer > 0.01f)
+                {
+                    jumpSound.Play();
+                    isJumping = true;
+                    currentSpeedY = jumpHight;
+                    jumpInputBufferTimer = -0.1f;
+                }
+                if (!downHit && jumpInputUp && currentSpeedY > 0)
+                {
+                    isJumpEarlyUp = true;
+                }
             }
-            if (!downHit && jumpInputUp && currentSpeedY > 0)
+            if (velocity.y < 0)
             {
-                isJumpEarlyUp = true;
+                DoubleJump();
             }
 
+        }
+    }
+
+    private void DoubleJump()
+    {
+        if (jumpInputBufferTimer > 0.01f && canDoubleJump)
+        {
+            canDoubleJump = false;
+            StopAllCoroutines();
+            useGravity = true;
+            isDashing = false;
+            isJumping = true;
+
+            currentSpeedY = doubleJumpHight;
         }
     }
 
     private void JumpOptimation()
     {
         // coyote Jump
-        if (downHit && downHit.collider.tag != "Wall")
+        if (downHit)
         {
             coyoteJumpTimer = coyoteJump;
+            canDoubleJump = true;
         }
         else
         {
@@ -264,7 +291,7 @@ public class MovementController : MonoBehaviour
         }
         else
         {
-            isJumping = false;
+            //isJumping = false;
             float fallspeed;
             if (isJumpEarlyUp && currentSpeedY > 0)
             {
@@ -275,19 +302,24 @@ public class MovementController : MonoBehaviour
                 fallspeed = fallGravity;
             }
             currentSpeedY -= fallspeed * Time.deltaTime;
+            Debug.Log(currentSpeedY);
             if (currentSpeedY < gravityClamp) currentSpeedY = gravityClamp;
         }
     }
     #endregion
 
     #region DASH
+
+    private bool borrrowPower;
     private void Dash()
     {
-        if (canDash)
+        if (canDash && downHit && PlayerInput._instance.Dash && !isWallSliding || borrrowPower && PlayerInput._instance.Dash && !isWallSliding)
         {
-            float dirX = inputDir.x != 0 ? inputDir.x : transform.localScale.x;
+            float inputx = inputDir.x > 0 ? 1 : -1;
+            float dirX = inputDir.x != 0 ? inputx : transform.localScale.x;
             float dirY = inputDir.x != 0 ? 1 : 0;
             StartCoroutine(Dashing(dirX,dirY));
+            jumpSound.Play();
         }       
     }
 
@@ -299,23 +331,27 @@ public class MovementController : MonoBehaviour
         currentSpeedY = dirY * dashDir.y;
         yield return new WaitForSeconds(dashTime);
 
+        canDoubleJump = true;
         canDash = false;
         useGravity = true;
         isDashing = false;
     }
+
+    // Dash Ω” ‹∫Û£¨
 
     public void RechargeWindow()
     {
         Debug.Log("Recharge");
         StopCoroutine(WindowCounter());
         StartCoroutine(WindowCounter());
+        
     }
 
     private IEnumerator WindowCounter()
     {
-        canDash = true;
+        borrrowPower = true;
         yield return new WaitForSeconds(rechargeTime);
-        canDash = false;
+        borrrowPower = false;
         
     }
     #endregion
@@ -379,6 +415,7 @@ public class MovementController : MonoBehaviour
             currentSpeedX = Mathf.Lerp(currentSpeedX, normal * wallJumpPower.x, wallJumpPower.x / wallJumpTime);
             currentSpeedY = Mathf.Lerp(currentSpeedY, wallJumpPower.y, wallJumpPower.y / wallJumpTime);
             Debug.Log("Wall Jump");
+            jumpSound.Play();
         }
         else
         {
