@@ -98,7 +98,8 @@ public class MovementController : MonoBehaviour
     public bool IsWallSliding => isWallSliding;
     public bool IsWallJumping => isWallJumping;
     public Vector2 Velocity => velocity;
-
+    public bool IsJumping => isJumping;
+    public bool Grounded => grounded;
 
     private void Awake()
     {
@@ -283,7 +284,7 @@ public class MovementController : MonoBehaviour
             if (currentSpeedY < 0)
             {
                 currentSpeedY = 0;
-
+                isJumping = false;
                 transform.position = (Vector3)downHit.point + new Vector3(0, 0.9f, 0);
                 isJumpEarlyUp = false;
             }
@@ -302,7 +303,6 @@ public class MovementController : MonoBehaviour
                 fallspeed = fallGravity;
             }
             currentSpeedY -= fallspeed * Time.deltaTime;
-            Debug.Log(currentSpeedY);
             if (currentSpeedY < gravityClamp) currentSpeedY = gravityClamp;
         }
     }

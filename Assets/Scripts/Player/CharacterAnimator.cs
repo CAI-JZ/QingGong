@@ -5,12 +5,12 @@ using UnityEngine;
 public class CharacterAnimator : MonoBehaviour
 {
     [Header("Reference")]
-    private SpriteRenderer _character;
-    private PlayerController _controller;
     [SerializeField] private MovementController controller;
     [SerializeField] private Animator _animator;
 
     bool isRun;
+    bool isAir;
+
 
     private void Awake()
     {
@@ -21,7 +21,23 @@ public class CharacterAnimator : MonoBehaviour
     private void Update()
     {
         isRun = PlayerInput._instance.HorizontalInput != 0;
+        isAir = !controller.Grounded;
+
+        Debug.Log(isAir);
+
         _animator.SetBool("isRun", isRun);
+        _animator.SetBool("isAir", isAir);
+
+        if (controller.IsJumping)
+        {
+            _animator.SetTrigger("Jump");
+        }
+
+        if (controller.Grounded)
+        {
+            _animator.ResetTrigger("Jump");
+        }
+
     }
 
 
