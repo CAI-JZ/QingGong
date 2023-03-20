@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 284093056}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: CastPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9055065663101343043}
   - component: {fileID: 9055065663101343044}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tree
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 9055065663439409549}
   - component: {fileID: 9055065663439409546}
   - component: {fileID: 45170528}
-  m_Layer: 10
+  m_Layer: 7
   m_Name: branch
   m_TagString: TreeBranch
   m_Icon: {fileID: 0}
@@ -236,7 +236,7 @@ HingeJoint2D:
   m_BreakTorque: Infinity
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: -1.15, y: 0}
-  m_ConnectedAnchor: {x: 21.050001, y: -1.365}
+  m_ConnectedAnchor: {x: -27.01, y: 15.168359}
   m_UseMotor: 1
   m_Motor:
     m_MotorSpeed: -100

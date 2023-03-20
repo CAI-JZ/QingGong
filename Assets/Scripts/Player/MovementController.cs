@@ -83,6 +83,7 @@ public class MovementController : MonoBehaviour
 
     [Header("Player State")]
     [SerializeField] private bool grounded;
+    [SerializeField] private bool rightRay;
     [SerializeField] private bool useGravity;
     [SerializeField] private bool isControllable;
     [SerializeField] private bool isAlive;
@@ -92,7 +93,8 @@ public class MovementController : MonoBehaviour
     private bool jumpInputUp;
     private bool jumpInputDown;
 
-    bool isTouchWall => currentSpeedX > 0 && rightHit && !isOnSlope || currentSpeedX < 0 && leftHit && !isOnSlope;
+    //bool isTouchWall => currentSpeedX > 0 && rightHit && !isOnSlope || currentSpeedX < 0 && leftHit && !isOnSlope;
+    bool isTouchWall => currentSpeedX > 0 && rightHit || currentSpeedX < 0 && leftHit;
 
     // reference
     public bool IsWallSliding => isWallSliding;
@@ -123,6 +125,7 @@ public class MovementController : MonoBehaviour
 
 #if UNITY_EDITOR
         grounded = downHit;
+        rightRay = rightHit;
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             //FlipDir();
@@ -153,7 +156,7 @@ public class MovementController : MonoBehaviour
     private void HandleMove()
     {
         // slope walk
-        if (downHit && isOnSlope && !isJumping && canMoveOn)
+        if (downHit && isOnSlope && !isJumping && canMoveOn && !isDashing)
         {
             velocity = slopeNormalDir * -currentSpeedX;
         }
@@ -189,7 +192,7 @@ public class MovementController : MonoBehaviour
     /// <summary>
     /// Jump
     /// </summary>
-#region Jump
+    #region Jump
     private void CalculateJumpApex()
     {
         if (!downHit)
@@ -311,13 +314,18 @@ public class MovementController : MonoBehaviour
     #region DASH
 
     private bool borrrowPower;
+    private bool dash => canDash && downHit && PlayerInput._instance.Dash && !isWallSliding;
+    private bool borrow => borrrowPower && PlayerInput._instance.Dash && !isWallSliding;
+
     private void Dash()
     {
-        if (canDash && downHit && PlayerInput._instance.Dash && !isWallSliding || borrrowPower && PlayerInput._instance.Dash && !isWallSliding)
+        if ( dash|| borrow )
         {
+            Debug.Log("在冲了在冲了");
             float inputx = inputDir.x > 0 ? 1 : -1;
             float dirX = inputDir.x != 0 ? inputx : transform.localScale.x;
             float dirY = inputDir.x != 0 ? 1 : 0;
+            Debug.Log("X:"+dirX +"Y:"+dirY);
             StartCoroutine(Dashing(dirX,dirY));
             jumpSound.Play();
         }       
@@ -374,7 +382,6 @@ public class MovementController : MonoBehaviour
 
         if (isWallSliding)
         {
-            Debug.Log("我碰到了！");
             wallJumpWindowTimer = wallJumpWindow;
             float normalDir = rightHit ? -1 : 1;
             if (inputDir.x == normalDir)
@@ -414,7 +421,6 @@ public class MovementController : MonoBehaviour
             isWallSliding = false;
             currentSpeedX = Mathf.Lerp(currentSpeedX, normal * wallJumpPower.x, wallJumpPower.x / wallJumpTime);
             currentSpeedY = Mathf.Lerp(currentSpeedY, wallJumpPower.y, wallJumpPower.y / wallJumpTime);
-            Debug.Log("Wall Jump");
             jumpSound.Play();
         }
         else
@@ -431,13 +437,13 @@ public class MovementController : MonoBehaviour
     private void SlopeCheck()
     {
         SlopeCheckVertial();
-        //SlopeCheckHorizontal();
+        SlopeCheckHorizontal();
     }
 
     private void SlopeCheckHorizontal()
     {
-        RaycastHit2D hitFront = Physics2D.Raycast(transform.position, transform.right, slopeCheckDis, 1 << 10);
-        RaycastHit2D hitBack = Physics2D.Raycast(transform.position, -transform.right, slopeCheckDis, 1 << 10);
+        RaycastHit2D hitFront = Physics2D.Raycast(transform.position, transform.right, slopeCheckDis, 1 << 7);
+        RaycastHit2D hitBack = Physics2D.Raycast(transform.position, -transform.right, slopeCheckDis, 1 << 7);
 
         if (hitFront || hitBack)
         {
@@ -454,20 +460,15 @@ public class MovementController : MonoBehaviour
 
     private void SlopeCheckVertial()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, slopeCheckDis, 1 << 10);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, slopeCheckDis, 1 << 7);
 
-        if (hit&& hit.collider.tag == "Slope")
+        if (hit/*&& hit.collider.tag == "Slope"*/)
         {
-            Debug.DrawRay(hit.point, slopeNormalDir, Color.red);
-            Debug.DrawRay(hit.point, hit.normal, Color.green);
-
+            Debug.DrawRay(hit.point, slopeNormalDir, Color.green);
+            Debug.DrawRay(hit.point, hit.normal, Color.white);
             slopeNormalDir = Vector2.Perpendicular(hit.normal).normalized;
             slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
             isOnSlope = true;
-            //if (slopeDownAngle != slopeDownAngleOld)
-            //{
-            //    isOnSlope = true;
-            //}
             slopeDownAngleOld = slopeDownAngle;
             canMoveOn = slopeDownAngle > maxSlopeAngle ? false : true;
         }
@@ -476,9 +477,6 @@ public class MovementController : MonoBehaviour
             slopeDownAngle = 0;
             isOnSlope = false;
         }
-
-       
-        
     }
     #endregion
 
@@ -519,11 +517,10 @@ public class MovementController : MonoBehaviour
 
     private void RayDetector()
     {
-
-        rightHit = Physics2D.Raycast(transform.position, Vector2.right, rayDis, (1 << 6 | 1 << 10));
-        leftHit = Physics2D.Raycast(transform.position, Vector2.left, rayDis, (1 << 6 | 1 << 10));
-        upHit = Physics2D.Raycast(transform.position, Vector2.up, rayDis, (1 << 10));
-        downHit = Physics2D.Raycast(transform.position, Vector2.down, rayDisDown, (1 << 10 | 1 << 6));
+        rightHit = Physics2D.Raycast(transform.position, Vector2.right, rayDis, (1 << 7));
+        leftHit = Physics2D.Raycast(transform.position, Vector2.left, rayDis, (1 << 7));
+        upHit = Physics2D.Raycast(transform.position, Vector2.up, rayDis, (1 << 7));
+        downHit = Physics2D.Raycast(transform.position, Vector2.down, rayDisDown, (1 << 7));
         Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDisDown, Color.red, 1);
         Debug.DrawLine(transform.position, transform.position + Vector3.right * rayDis, Color.red, 1);
 

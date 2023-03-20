@@ -27,6 +27,7 @@ public class CharacterAnimator : MonoBehaviour
 
         _animator.SetBool("isRun", isRun);
         _animator.SetBool("isAir", isAir);
+        _animator.SetBool("isDown", controller.Velocity.y < 0);
 
         if (controller.IsJumping)
         {
