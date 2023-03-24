@@ -22,21 +22,28 @@ public class FollowCamera : MonoBehaviour
 
     private bool lookAheadStoped;
 
+    private bool isStart;
     private FocusArea focusArea;
 
     private void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
+        isStart = false;
     }
 
-    private void Start()
+    public void GameStart()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         playerCollider = player.GetComponent<Collider2D>();
         focusArea = new FocusArea(playerCollider.bounds, focusAreaSize);
+        isStart = true;
     }
 
     private void LateUpdate()
     {
+        if (!isStart)
+        {
+            return;
+        }
 
         // UPDATE FOCUS AREA 
         focusArea.Update(playerCollider.bounds);

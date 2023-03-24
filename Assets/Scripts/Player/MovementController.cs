@@ -39,7 +39,7 @@ public class MovementController : MonoBehaviour
     [SerializeField] private bool isDashing;
     [SerializeField] private bool canDash;
     [SerializeField] private float rechargeTime = 0.2f;
-    
+
     [Header("Wall Jump & Wall Slide")]
     [SerializeField] public bool isWallSliding;
     [SerializeField] private float wallSlideSpeed = 2f;
@@ -105,16 +105,20 @@ public class MovementController : MonoBehaviour
 
     private void Awake()
     {
-        isAlive = true;
-        isControllable = true;
+        isControllable = false;
         canInput = true;
         useGravity = true;
         canDash = true;
     }
 
+    public void GameStart()
+    {
+        isControllable = true;
+    }
+
     private void Update()
     {
-        if (!isAlive)
+        if (!isControllable)
         {
             return;
         }
@@ -168,7 +172,7 @@ public class MovementController : MonoBehaviour
 
     private void CalculateWalkSpeed()
     {
-        if (isControllable && !isWallJumping && !isDashing)
+        if (!isWallJumping && !isDashing)
         {
             if (inputDir.x != 0)
             {
@@ -208,7 +212,7 @@ public class MovementController : MonoBehaviour
 
     private void Jump()
     {
-        if (isControllable && !isWallSliding)
+        if (!isWallSliding)
         {
             if (!isDashing)
             {
