@@ -7,17 +7,16 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance { get; private set; }
 
-    [SerializeField]public Rect Tutorial;
     private FollowCamera _mainCamera;
     private GameObject _player;
-
+    private Vector3 currentCheckPoint;
 
     [SerializeField] CanvasGroup welcome;
     [SerializeField] CanvasGroup gaming;
     [SerializeField] CanvasGroup esc;
 
     [SerializeField] Button startGame;
-    Button Exit;
+    [SerializeField] Button exit;
 
 
     private void Awake()
@@ -31,6 +30,7 @@ public class GameManager : MonoBehaviour
         _mainCamera = GetComponent<FollowCamera>();
         _player = GameObject.FindGameObjectWithTag("Player");
         startGame.onClick.AddListener(WhenGameStart);
+        exit.onClick.AddListener(WhenExit);
     }
 
     // Start is called before the first frame update
@@ -47,14 +47,13 @@ public class GameManager : MonoBehaviour
 
     public void WhenPlayerDead()
     {
-        Debug.Log("PlayerDead");
-        Debug.Log("Player Go to Check Point");
+        Debug.Log("PlayerDead,Respawn");
+        _player.transform.position = currentCheckPoint;
     }
 
-    private void OnGUI()
+    public void UpdateCheckPoint(Vector3 newPos)
     {
-        string content = "W,A,S,D ÒÆ¶¯";
-        GUI.Label(Tutorial, "W,A,S,D ÒÆ¶¯");
+        currentCheckPoint = newPos;
     }
 
     private void WhenGameStart()
@@ -63,6 +62,15 @@ public class GameManager : MonoBehaviour
         _player.GetComponent<MovementController>().GameStart();
         _mainCamera.GameStart();
         UIStartHidden();
+    }
+
+    private void WhenExit()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     private void UIStartHidden()

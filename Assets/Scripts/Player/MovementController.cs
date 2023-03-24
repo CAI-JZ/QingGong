@@ -103,6 +103,8 @@ public class MovementController : MonoBehaviour
     public bool IsJumping => isJumping;
     public bool Grounded => grounded;
 
+    public bool IsControllable => isControllable;
+
     private void Awake()
     {
         isControllable = false;
@@ -117,12 +119,11 @@ public class MovementController : MonoBehaviour
     }
 
     private void Update()
-    {
+    {    
         if (!isControllable)
         {
             return;
         }
-
         RayDetector();
         InputDetector();
         FlipPlayerDir();

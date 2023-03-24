@@ -18,13 +18,23 @@ public class CharacterAnimator : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
     }
 
+    private void Start()
+    {
+        
+    }
+
     private void Update()
     {
+        if (!controller.IsControllable)
+        {
+            _animator.SetBool("isAir", false);
+            return;
+        }
+
         isRun = PlayerInput._instance.HorizontalInput != 0;
         isAir = !controller.Grounded;
 
-        Debug.Log(isAir);
-
+        _animator.SetBool("isWallRuning", controller.IsWallSliding);
         _animator.SetBool("isRun", isRun);
         _animator.SetBool("isAir", isAir);
         _animator.SetBool("isDown", controller.Velocity.y < 0);
