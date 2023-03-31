@@ -5,29 +5,38 @@ using UnityEngine;
 public class FollowCamera : MonoBehaviour
 {
     [Header("Reference")]
-    private GameObject player;
+    [SerializeField] private GameObject player;
     [SerializeField] private Collider2D playerCollider;
-
-    [SerializeField] private Vector3 cameraOffset;
+    [SerializeField] private Vector2 cameraOffset;
     [SerializeField] private Vector2 focusAreaSize;
-    [SerializeField]private float offsetY;
 
     [Header("Horizontal Control")]
     private float lookAheadDirx;
     private float targetLookAheadX;
-    [SerializeField] private float lookAheadDisX;
     private float currentLookAheadX;
-    [SerializeField]private float dampVelocity;
+    private bool lookAheadStoped;
+    [SerializeField] private float lookAheadDisX;
+    [SerializeField] private float dampVelocityX;
+    [SerializeField] private float dampTimeX;
+
+    [Header("Vertical Control")]
+    [SerializeField] private float dampVelocityY;
+    [SerializeField] private float dampTimeY;
+
+    [Header("WhenPlayerRespawn")]
+    [SerializeField] private Vector3 dampVelocity;
     [SerializeField] private float dampTime;
 
-    private bool lookAheadStoped;
-
     private bool isStart;
+    public bool isFollow;
+    public bool isMoving;
+    public Vector3 checkPoint;
     private FocusArea focusArea;
 
     private void Awake()
     {
         isStart = false;
+        isFollow = false;
     }
 
     public void GameStart()
@@ -36,19 +45,21 @@ public class FollowCamera : MonoBehaviour
         playerCollider = player.GetComponent<Collider2D>();
         focusArea = new FocusArea(playerCollider.bounds, focusAreaSize);
         isStart = true;
+        isFollow = true;
     }
 
     private void LateUpdate()
     {
-        if (!isStart)
+
+        if (!isStart || !isFollow)
         {
             return;
         }
 
-        // UPDATE FOCUS AREA 
+        // Update focus area;
         focusArea.Update(playerCollider.bounds);
 
-        Vector2 focusPosition = (Vector3)focusArea.center + cameraOffset;
+        Vector2 focusPosition = focusArea.center + cameraOffset;
 
         // horizontal control
         if (focusArea.velocity.x != 0)
@@ -61,23 +72,25 @@ public class FollowCamera : MonoBehaviour
             }
             else if(!lookAheadStoped)
             {
-                targetLookAheadX = currentLookAheadX + (lookAheadDirx * lookAheadDisX - currentLookAheadX) / 4;
+                targetLookAheadX = currentLookAheadX + (lookAheadDirx * lookAheadDisX - currentLookAheadX) / 1.5f;
                 lookAheadStoped = true;
             }
         }
-        currentLookAheadX = Mathf.SmoothDamp(currentLookAheadX, targetLookAheadX, ref dampVelocity, dampTime);
+        currentLookAheadX = Mathf.SmoothDamp(currentLookAheadX, targetLookAheadX, ref dampVelocityX, dampTimeX);
         focusPosition += Vector2.right * currentLookAheadX;
 
         // vertical control;
-        //if()
+        focusPosition.y = Mathf.SmoothDamp(transform.position.y,focusPosition.y, ref dampVelocityY, dampTimeY);
 
-        transform.position = new Vector3(focusPosition.x, player.transform.position.y+ offsetY, -10);
+        // Camera Smooth Follow
+        transform.position = new Vector3(focusPosition.x, focusPosition.y, -10);
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = new Color(1, 0, 0, 0.4f);
         Gizmos.DrawCube(focusArea.center, focusAreaSize);
+        Gizmos.DrawSphere(focusArea.center, 0.2f);
     }
 
 }

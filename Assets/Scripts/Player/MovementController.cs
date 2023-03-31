@@ -16,6 +16,8 @@ public class MovementController : MonoBehaviour
     [SerializeField] private Vector2 velocity;
     [SerializeField] private float currentSpeedX;
     [SerializeField] private float currentSpeedY;
+    [SerializeField] private float staminaMaxValue;
+    [SerializeField] private float currentStamina;
     public CharDir playerDir = CharDir.Right;
 
     [Header("JUMP")]
@@ -41,13 +43,13 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float rechargeTime = 0.2f;
 
     [Header("Wall Jump & Wall Slide")]
-    [SerializeField] public bool isWallSliding;
     [SerializeField] private float wallSlideSpeed = 2f;
     [SerializeField] private float wallJumpTime = 0.2f;
     [SerializeField] private float wallJumpWindow = 0.1f;
     [SerializeField] private Vector2 wallJumpPower = new Vector2(8f, 16f);
-    private float wallJumpWindowTimer;
+    public bool isWallSliding;
     private bool isWallJumping;
+    private float wallJumpWindowTimer;
     private float wallJumpTimer;
 
     [Header("GRAVITY")]
@@ -94,7 +96,7 @@ public class MovementController : MonoBehaviour
     private bool jumpInputDown;
 
     //bool isTouchWall => currentSpeedX > 0 && rightHit && !isOnSlope || currentSpeedX < 0 && leftHit && !isOnSlope;
-    bool isTouchWall => currentSpeedX > 0 && rightHit || currentSpeedX < 0 && leftHit;
+    bool isTouchWall => currentSpeedX > 0 && rightHit && !isOnSlope || currentSpeedX < 0 && leftHit && !isOnSlope;
 
     // reference
     public bool IsWallSliding => isWallSliding;
@@ -289,7 +291,8 @@ public class MovementController : MonoBehaviour
         if (downHit)
         {
             canDash = true;
-            if (currentSpeedY < 0)
+            currentStamina = staminaMaxValue;
+            if (currentSpeedY <= 0)
             {
                 currentSpeedY = 0;
                 isJumping = false;
@@ -380,7 +383,7 @@ public class MovementController : MonoBehaviour
     }
 
     bool isWalled => rightHit || leftHit;
-   
+
     private void WallSlide()
     {
         isWallSliding = isWalled && !downHit && inputDir.x != 0f ? true : false;
@@ -389,20 +392,35 @@ public class MovementController : MonoBehaviour
         {
             wallJumpWindowTimer = wallJumpWindow;
             float normalDir = rightHit ? -1 : 1;
-            if (inputDir.x == normalDir)
+
+            if (inputDir.x == normalDir || currentStamina < 0)
             {
                 return;
             }
 
             velocity = Vector3.zero;
             currentSpeedX = 0;
-            currentSpeedY = Mathf.Clamp(currentSpeedY, wallSlideSpeed, float.MaxValue);
+            //currentSpeedY = Mathf.Clamp(currentSpeedY, wallSlideSpeed, float.MaxValue);
+            StopCoroutine(WallStaminaDecrease(0.5f));
+            StartCoroutine(WallStaminaDecrease(0.5f));
+            currentSpeedY = wallSlideSpeed;
         }
         else
         {
+            StopCoroutine(WallStaminaDecrease(1f));
             wallJumpWindowTimer -= Time.deltaTime;
             if (wallJumpWindowTimer < 0) wallJumpWindowTimer = -0.1f;
         }
+    }
+
+    IEnumerator WallStaminaDecrease(float decMul)
+    {
+        while (currentStamina > 0)
+        {
+            currentStamina -= decMul;
+            yield return new WaitForSecondsRealtime(3f);
+        }
+        currentStamina = - 0.1f;  
     }
 
     private void WallJump()
@@ -442,7 +460,7 @@ public class MovementController : MonoBehaviour
     private void SlopeCheck()
     {
         SlopeCheckVertial();
-        SlopeCheckHorizontal();
+        //SlopeCheckHorizontal();
     }
 
     private void SlopeCheckHorizontal()
@@ -467,21 +485,21 @@ public class MovementController : MonoBehaviour
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, slopeCheckDis, 1 << 7);
 
-        if (hit/*&& hit.collider.tag == "Slope"*/)
+        if (!hit) return;
+        Debug.DrawRay(hit.point, slopeNormalDir, Color.green);
+        Debug.DrawRay(hit.point, hit.normal, Color.white);
+        slopeNormalDir = Vector2.Perpendicular(hit.normal).normalized;
+        slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
+        if (slopeDownAngle > 0)
         {
-            Debug.DrawRay(hit.point, slopeNormalDir, Color.green);
-            Debug.DrawRay(hit.point, hit.normal, Color.white);
-            slopeNormalDir = Vector2.Perpendicular(hit.normal).normalized;
-            slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
             isOnSlope = true;
-            slopeDownAngleOld = slopeDownAngle;
             canMoveOn = slopeDownAngle > maxSlopeAngle ? false : true;
         }
         else
         {
-            slopeDownAngle = 0;
             isOnSlope = false;
         }
+        //slopeDownAngleOld = slopeDownAngle;
     }
     #endregion
 
@@ -522,15 +540,15 @@ public class MovementController : MonoBehaviour
 
     private void RayDetector()
     {
-        rightHit = Physics2D.Raycast(transform.position, Vector2.right, rayDis, (1 << 7));
-        leftHit = Physics2D.Raycast(transform.position, Vector2.left, rayDis, (1 << 7));
+        rightHit = Physics2D.Raycast(transform.position+Vector3.down * 0.8f, Vector2.right, rayDis, (1 << 7));
+        leftHit = Physics2D.Raycast(transform.position + Vector3.down * 0.8f, Vector2.left, rayDis, (1 << 7));
         upHit = Physics2D.Raycast(transform.position, Vector2.up, rayDis, (1 << 7));
-        downHit = Physics2D.Raycast(transform.position, Vector2.down, rayDisDown, (1 << 7));
-        Debug.DrawLine(transform.position, transform.position + Vector3.down * rayDisDown, Color.red, 1);
-        Debug.DrawLine(transform.position, transform.position + Vector3.right * rayDis, Color.red, 1);
-
+        downHit = Physics2D.Raycast(transform.position + Vector3.down * 0.8f, Vector2.down, rayDisDown, (1 << 7));
+        Debug.DrawLine(transform.position + Vector3.down * 0.7f, transform.position + Vector3.down * (rayDisDown+0.8f), Color.red, 1);
+        Debug.DrawLine(transform.position+ Vector3.down * 0.8f, transform.position + Vector3.down * 0.8f + Vector3.right * rayDis, Color.red, 1);
+        Debug.DrawLine(transform.position + Vector3.down * 0.8f, transform.position + Vector3.down * 0.8f + Vector3.left * rayDis, Color.red, 1);
         //interacte = Physics2D.Raycast(transform.position, Vector2.right, interactDecDis, (1 << 8));
-       
+
     }
 
  

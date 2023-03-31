@@ -18,12 +18,14 @@ public class PlayerInput : MonoBehaviour
     private bool _jumpInputDown;
     private bool _jumpInputUp;
     private bool _dash;
+    private bool _isPause;
 
     public float HorizontalInput => _horizontalInput;
     public float VerticalInput => _verticalInput;
     public bool jumpBtnDown => _jumpInputDown;
     public bool jumpBtnUp => _jumpInputUp;
     public bool Dash => _dash;
+    public bool Pause => _isPause;
 
     private void Awake()
     {
@@ -33,7 +35,6 @@ public class PlayerInput : MonoBehaviour
             return;
         }
         _instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
@@ -46,6 +47,7 @@ public class PlayerInput : MonoBehaviour
         _jumpInputDown = Input.GetButtonDown("Jump");
         _jumpInputUp = Input.GetButtonUp("Jump");
         _dash = Input.GetButtonDown("Dash");
+        _isPause = Input.GetKeyDown(KeyCode.Escape);
 
         if (_dash)
         {
