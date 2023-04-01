@@ -37,7 +37,7 @@ public class WaterWave : MonoBehaviour
         }
         if (_lineRenderer != null)
         {
-            //WavePosUpdate();
+            WavePosUpdate();
         }
         
     }

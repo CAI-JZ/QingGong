@@ -15,7 +15,7 @@ public class WaterNode : MonoBehaviour
 
     [SerializeField] private float resistance = 1;
     [SerializeField] private int waveIndex = 0;
-    [SerializeField] private GameObject wavePerfab;
+    //[SerializeField] private GameObject wavePerfab;
 
     public float Height => currentHeight;
     public float Velocity
@@ -68,8 +68,8 @@ public class WaterNode : MonoBehaviour
 
             velocity += speed / resistance;
 
-            Instantiate(wavePerfab, transform.position, new Quaternion(0, 0, 0, 0), transform);
-            wavePerfab.GetComponentInChildren<WaterWave>().Initialization(_waterController, waveIndex);
+            //Instantiate(wavePerfab, transform.position, new Quaternion(0, 0, 0, 0), transform);
+            //wavePerfab.GetComponentInChildren<WaterWave>().Initialization(_waterController, waveIndex);
         }
     }
 }
