@@ -272,8 +272,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6402379329850656935}
-  - component: {fileID: 6402379329850656937}
-  - component: {fileID: 6402379329850656934}
   - component: {fileID: 6402379329850656933}
   - component: {fileID: 302496640}
   - component: {fileID: 462431363}
@@ -299,73 +297,10 @@ Transform:
   - {fileID: 6402379329267002878}
   - {fileID: 7319303508556365077}
   - {fileID: 3199484792561214332}
+  - {fileID: 2346100160551416834}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6402379329850656937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6402379329850656938}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a7aeabaf1e98e34aa67a3ab9f0abe36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _charMove: {fileID: 0}
-  maxSpeed: 10
-  velocity: {x: 0, y: 0, z: 0}
-  inputDir: {x: 0, y: 0}
-  playerDir: 0
-  moveAcceleration: 150
-  deAcceleration: 450
-  currentSpeed: 0
-  currentVelocity: {x: 0, y: 0, z: 0}
-  currentVelX: 0
-  currentVelY: 0
-  jumpHight: 25
-  jumpApexThreshold: 10
-  jumpEarlyMul: 8
-  coyoteJump: 0.15
-  jumpInputBuffer: 0.1
-  fallHorizontalMul: 20
-  slopeCheckDis: 1
-  wallJumpPower: {x: 0, y: 0}
-  dashPower: 18
-  deshAcceleration: 200
-  dashDeceleration: 15
-  gravityClamp: -30
-  minFallGravity: 80
-  maxFallGraviyt: 120
-  fallGravity: 0
-  fallSpeed: 0
-  useGravity: 0
-  inputEnable: 0
-  isAlive: 0
---- !u!114 &6402379329850656934
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6402379329850656938}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87e35b0e515b53347b4575e42078c006, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rayDis: 0.7
-  rayDisDown: 1
-  wallForward: {x: 0, y: 0, z: 0}
-  wallAngle: 0
-  canSlpoeWalk: 0
-  qiJumpPower: 50
-  qiGraviytMul: 0.2
-  canRecharge: 0
-  currentRechargeType: 0
-  rechargeTime: 0.1
 --- !u!114 &6402379329850656933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -382,9 +317,11 @@ MonoBehaviour:
   velocity: {x: 0, y: 0}
   currentSpeedX: 0
   currentSpeedY: 0
+  staminaMaxValue: 30
+  currentStamina: 0
   playerDir: 0
   jumpHight: 25
-  doubleJumpHight: 10
+  doubleJumpHight: 15
   jumpApexThreshold: 10
   jumpEarlyMul: 3
   coyoteJump: 0.1
@@ -392,16 +329,16 @@ MonoBehaviour:
   coyoteJumpTimer: 0
   jumpInputBufferTimer: 0
   jumpSound: {fileID: 699685561}
-  dashDir: {x: 25, y: 15}
+  dashDir: {x: 25, y: 20}
   dashTime: 0.15
   isDashing: 0
   canDash: 0
   rechargeTime: 0.2
-  isWallSliding: 0
   wallSlideSpeed: 8
   wallJumpTime: 0.15
   wallJumpWindow: 0.1
   wallJumpPower: {x: 20, y: 25}
+  isWallSliding: 0
   gravityClamp: -30
   minFallGravity: 80
   maxFallGraviyt: 120
@@ -413,8 +350,8 @@ MonoBehaviour:
   maxSlopeAngle: 45
   slopeDownAngle: 0
   isOnSlope: 0
-  rayDis: 0.5
-  rayDisDown: 0.9
+  rayDis: 0.65
+  rayDisDown: 0.4
   interactDecDis: 0.8
   grounded: 0
   rightRay: 0
@@ -581,7 +518,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6402379330736625142}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.05, z: 0}
+  m_LocalPosition: {x: 0, y: 0.014, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6402379329267002878}
@@ -625,7 +562,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1157915551
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 399cdaf4bc76f2c45a38c796531481dc, type: 3}
   m_Color: {r: 0.9811321, g: 0.9743444, b: 0.96724814, a: 1}
@@ -657,6 +594,72 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!1001 &883865182
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 6402379329850656935}
+    m_Modifications:
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2633884926507021299, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_Name
+      value: GrassPartical
+      objectReference: {fileID: 0}
+    - target: {fileID: 2633884926507021299, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+--- !u!4 &2346100160551416834 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2346100159685444188, guid: a5aa4f3bd5bcb9440acc261ffb58f4fc, type: 3}
+  m_PrefabInstance: {fileID: 883865182}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4360443534558974667
 PrefabInstance:
   m_ObjectHideFlags: 0

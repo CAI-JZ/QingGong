@@ -23,6 +23,7 @@ public class Bamboo : MonoBehaviour
     [Header("Bamboo Data")]
     [SerializeField] private float bambooSegLength = 1f;
     [SerializeField] public int segmentCount = 5;
+    [SerializeField] public GameObject bambooNodePrefab;
 
     [Header("Test")]
     [SerializeField] public float segRadius = 1;
@@ -45,7 +46,8 @@ public class Bamboo : MonoBehaviour
         {
             bambooSegments.Add(new BambooSegment(firstPointPos));
             firstPointPos.y += bambooSegLength;
-
+            //GameObject node = Instantiate(bambooNodePrefab,)
+            
         }
     }
 
@@ -76,6 +78,7 @@ public class Bamboo : MonoBehaviour
         if(bambooSegments.Count <= 0)
         {
             InitBambooSege();
+            //return;
         }
 
         for (int i = 0; i < bambooSegments.Count; i++)
@@ -171,11 +174,13 @@ public class Bamboo : MonoBehaviour
     {
         public Vector2 posNow;
         public Vector2 posOld;
+        //public GameObject bambooNode;
 
         public BambooSegment(Vector2 position)
         {
             posNow = position;
             posOld = position;
+            //bambooNode = Instantiate(prefab, position,Quaternion.identity, parent);
         }
     }
 }

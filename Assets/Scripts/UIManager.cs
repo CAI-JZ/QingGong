@@ -7,6 +7,8 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager instance { get; private set; }
 
+
+
     [Header("Start Page")]
     [SerializeField] CanvasGroup startCanvas;
     [SerializeField] Button startGame;
@@ -18,9 +20,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] Button exit;
 
     [Header("Title")]
-    [SerializeField] GameObject title;
-    [SerializeField] GameObject[] titles;
-    private GameObject currentTitle;
+    [SerializeField] CanvasGroup[] titles;
+    private CanvasGroup currentTitle;
+    [SerializeField] private float fadeMul;
+    [SerializeField] private float titleHideDelay;
 
     public CanvasGroup StartCanvas => startCanvas;
 
@@ -48,16 +51,6 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        if (title != null)
-        {
-            int count = title.transform.childCount;
-            titles = new GameObject[count];
-            for (int i = 0; i < count; i++)
-            {
-                titles[i] = title.transform.GetChild(i).gameObject;
-            }
-        }
-
         startGame.onClick.AddListener(OnBtnStartGame);
         exitGame.onClick.AddListener(OnBtnExitGame);
         continueGame.onClick.AddListener(OnBtnContinueGame);
@@ -73,13 +66,13 @@ public class UIManager : MonoBehaviour
             return;
         }
         currentTitle = titles[theme];
-        currentTitle.SetActive(true);
-        Invoke("TitleHide", 3f);
+        ShowUI(currentTitle);
+        Invoke("TitleHide", titleHideDelay);
     }
 
     private void TitleHide()
     {
-        currentTitle.SetActive(false);
+        HideUI(currentTitle.GetComponent<CanvasGroup>(),true);
     }
 
     private void OnBtnStartGame()
@@ -106,7 +99,7 @@ public class UIManager : MonoBehaviour
 
     public void HideUI(CanvasGroup canvasGroup, bool isActive)
     {
-        canvasGroup.alpha = 0;
+        StartCoroutine(DecreaseAlpha(canvasGroup));
         if (!isActive)
         {
             canvasGroup.gameObject.SetActive(isActive);
@@ -119,7 +112,29 @@ public class UIManager : MonoBehaviour
         {
             canvasGroup.gameObject.SetActive(true);
         }
-        canvasGroup.alpha = 1;
+        StartCoroutine(IncreaseAlpha(canvasGroup));
     }
 
+
+    IEnumerator DecreaseAlpha(CanvasGroup canvas)
+    {
+        while (canvas.alpha > 0)
+        {
+            canvas.alpha -= Time.deltaTime * fadeMul;
+            yield return new WaitForFixedUpdate();
+        }
+
+        canvas.alpha = 0;
+    }
+
+    IEnumerator IncreaseAlpha(CanvasGroup canvas)
+    {
+        while (canvas.alpha < 1)
+        {
+            canvas.alpha += Time.deltaTime * fadeMul;
+            yield return new WaitForFixedUpdate();
+        }
+
+        canvas.alpha = 1;
+    }
 }

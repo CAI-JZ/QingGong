@@ -18,6 +18,7 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float currentSpeedY;
     [SerializeField] private float staminaMaxValue;
     [SerializeField] private float currentStamina;
+    [SerializeField] private float wallStaminaMul;
     public CharDir playerDir = CharDir.Right;
 
     [Header("JUMP")]
@@ -28,8 +29,8 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float jumpEarlyMul = 3f;
     [SerializeField] private float coyoteJump = 0.2f;
     [SerializeField] private float jumpInputBuffer = 0.2f;
-    [SerializeField] private float coyoteJumpTimer;
-    [SerializeField] private float jumpInputBufferTimer;
+    private float coyoteJumpTimer;
+    private float jumpInputBufferTimer;
     private float apexPoint;
     private bool isJumping;
     private bool canDoubleJump;
@@ -44,6 +45,8 @@ public class MovementController : MonoBehaviour
 
     [Header("Wall Jump & Wall Slide")]
     [SerializeField] private float wallSlideSpeed = 2f;
+    [SerializeField] private float currentWallSpeed;
+    [SerializeField] private float wallSpeedTerp;
     [SerializeField] private float wallJumpTime = 0.2f;
     [SerializeField] private float wallJumpWindow = 0.1f;
     [SerializeField] private Vector2 wallJumpPower = new Vector2(8f, 16f);
@@ -88,14 +91,12 @@ public class MovementController : MonoBehaviour
     [SerializeField] private bool rightRay;
     [SerializeField] private bool useGravity;
     [SerializeField] private bool isControllable;
-    [SerializeField] private bool isAlive;
     [SerializeField] private bool canInput;
 
     //Input
     private bool jumpInputUp;
     private bool jumpInputDown;
 
-    //bool isTouchWall => currentSpeedX > 0 && rightHit && !isOnSlope || currentSpeedX < 0 && leftHit && !isOnSlope;
     bool isTouchWall => currentSpeedX > 0 && rightHit && !isOnSlope || currentSpeedX < 0 && leftHit && !isOnSlope;
 
     // reference
@@ -135,8 +136,6 @@ public class MovementController : MonoBehaviour
         rightRay = rightHit;
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            //FlipDir();
-            //Recharge();
             Dash();
         }
 #endif
@@ -154,6 +153,14 @@ public class MovementController : MonoBehaviour
     }
 
 
+    private void ResetPlayerData()
+    {
+        currentStamina = staminaMaxValue;
+        currentWallSpeed = wallSlideSpeed; 
+        canDash = true;
+    }
+
+    #region Run
     private void CharacterMove()
     {
         HandleMove();
@@ -195,6 +202,7 @@ public class MovementController : MonoBehaviour
             }
         }
     }
+    #endregion
 
     /// <summary>
     /// Jump
@@ -290,8 +298,7 @@ public class MovementController : MonoBehaviour
         }
         if (downHit)
         {
-            canDash = true;
-            currentStamina = staminaMaxValue;
+            ResetPlayerData();
             if (currentSpeedY <= 0)
             {
                 currentSpeedY = 0;
@@ -398,29 +405,24 @@ public class MovementController : MonoBehaviour
                 return;
             }
 
-            velocity = Vector3.zero;
+            //velocity = Vector3.zero;
             currentSpeedX = 0;
             //currentSpeedY = Mathf.Clamp(currentSpeedY, wallSlideSpeed, float.MaxValue);
-            StopCoroutine(WallStaminaDecrease(0.5f));
-            StartCoroutine(WallStaminaDecrease(0.5f));
             currentSpeedY = wallSlideSpeed;
+            //currentSpeedY = currentWallSpeed;
+            //currentWallSpeed = Mathf.Lerp(currentWallSpeed,0, wallSpeedTerp);
+            WallStaminaDecrease(wallStaminaMul);
         }
         else
         {
-            StopCoroutine(WallStaminaDecrease(1f));
             wallJumpWindowTimer -= Time.deltaTime;
             if (wallJumpWindowTimer < 0) wallJumpWindowTimer = -0.1f;
         }
     }
 
-    IEnumerator WallStaminaDecrease(float decMul)
+    private void WallStaminaDecrease(float decMul)
     {
-        while (currentStamina > 0)
-        {
-            currentStamina -= decMul;
-            yield return new WaitForSecondsRealtime(3f);
-        }
-        currentStamina = - 0.1f;  
+        currentStamina -= Time.deltaTime * decMul;
     }
 
     private void WallJump()
@@ -515,13 +517,6 @@ public class MovementController : MonoBehaviour
             transform.localScale = new Vector3(-1, 1, 1);
         }
     }
-
-    private void FlipDir()
-    {
-        float dir = transform.localScale.x * -1;
-        transform.localScale = new Vector3(dir, 1, 1);
-    }
-
 
     /// <summary>
     /// Detector

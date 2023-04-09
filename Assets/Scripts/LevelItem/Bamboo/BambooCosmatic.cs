@@ -8,11 +8,24 @@ public class BambooCosmatic : MonoBehaviour
     [SerializeField] private LineRenderer _lineRenderer;
     [SerializeField] private Bamboo _bamboo;
 
+    private void Awake()
+    {
+        _lineRenderer = GetComponent<LineRenderer>();
+        if (_lineRenderer != null)
+        {
+            Debug.Log("get renderer");
+        }
+        else
+        {
+            Debug.Log("do not get renderer");
+        }
+        _bamboo = gameObject.transform.parent.GetComponentInChildren<Bamboo>();
+    }
 
     private void Start()
     {
-        _lineRenderer = GetComponent<LineRenderer>();
-        _bamboo = gameObject.transform.parent.GetComponentInChildren<Bamboo>();
+        
+       
 
     }
 
@@ -24,6 +37,7 @@ public class BambooCosmatic : MonoBehaviour
     public void SetRender(int count)
     {
         _lineRenderer.positionCount = count;
+        Debug.Log("point Count£º " + _lineRenderer.positionCount);
         SetNodePos();
     }
 

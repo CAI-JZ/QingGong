@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3603111437297068419}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39,7 +39,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3603111437567414443}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Bamboo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3603111438729742963}
   - component: {fileID: 3603111438729742960}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Physics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,6 +114,7 @@ MonoBehaviour:
   _cosmatic: {fileID: 1784311359}
   bambooSegLength: 2
   segmentCount: 7
+  bambooNodePrefab: {fileID: 0}
   segRadius: 0.2
 --- !u!1 &3638692995033567869
 GameObject:
@@ -126,7 +127,7 @@ GameObject:
   - component: {fileID: 6913796052621002167}
   - component: {fileID: 5633341452074937334}
   - component: {fileID: 1784311359}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cosmatic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -242,7 +243,7 @@ LineRenderer:
     textureMode: 3
     shadowBias: 0.5
     generateLightingData: 0
-  m_UseWorldSpace: 0
+  m_UseWorldSpace: 1
   m_Loop: 0
 --- !u!114 &1784311359
 MonoBehaviour:
