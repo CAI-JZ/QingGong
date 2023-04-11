@@ -2,18 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bamboo : MonoBehaviour
+public class Bamboo : MonoBehaviour,IBamboo
 {
+    [Header("Reference")]
+    [SerializeField] private BambooCosmatic _cosmatic;
+    
     [Header("Swing")]
     [SerializeField] private Transform constrainPoint;
-    [SerializeField] private float horizForcePower;
+    private float horizForcePower;
     [SerializeField] private float vertForcePower;
     [SerializeField] private float velocity;
     [SerializeField] private float forceIntert;
+    [SerializeField] private float swingDampMul;
+    [SerializeField] private float swingDir;
+    [SerializeField] private float bambooHight;
+    [SerializeField] private float forceMaxValue;
 
-    [SerializeField] private BambooCosmatic _cosmatic;
+    [Header("Test")]
+    [SerializeField] private float impluseForce;
+    [SerializeField] private float testDir;
+    
 
-    bool isAddForce;
 
     // 末端定点永远想要去靠近的点
 
@@ -23,9 +32,6 @@ public class Bamboo : MonoBehaviour
     [Header("Bamboo Data")]
     [SerializeField] private float bambooSegLength = 1f;
     [SerializeField] public int segmentCount = 5;
-    [SerializeField] public GameObject bambooNodePrefab;
-
-    [Header("Test")]
     [SerializeField] public float segRadius = 1;
 
     private void Start()
@@ -35,6 +41,7 @@ public class Bamboo : MonoBehaviour
         {
             _cosmatic.SetRender(bambooSegments.Count);
         }
+        bambooHight = bambooSegLength * (segmentCount - 1);
     }
 
     private void InitBambooSege()
@@ -57,19 +64,63 @@ public class Bamboo : MonoBehaviour
         Simulate();
     }
 
-    private void GetTargetPos()
+    public void AddImpluse(float force, float dir)
     {
-        if (Input.GetMouseButton(0))
-        {
-            //force = Mathf.Lerp(force, horizForcePower, Time.time * forceIntert);
-            isAddForce = true;
+        horizForcePower = force;
+        if (dir != 0){
+            swingDir = dir > 0 ? 1 : -1;
         }
         else
         {
-            
-            isAddForce = false;
+            swingDir = 0;
         }
-        //mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        StartCoroutine(ImpluseDecrease());
+    }
+
+    IEnumerator ImpluseDecrease()
+    {
+        while (horizForcePower > 0)
+        {
+            horizForcePower -= Time.deltaTime * swingDampMul;
+            yield return null;
+        }
+        horizForcePower = 0f;
+        swingDir = 0;
+    }
+
+    public void AddForce(float posY, float dir)
+    {
+        if (dir != 0)
+        {
+            swingDir = dir > 0 ? 1 : -1;
+        }
+        else
+        {
+            swingDir = 0;
+        }
+        float force = posY / bambooHight * forceMaxValue;
+        horizForcePower = force;
+    }
+
+    float a = 0;
+    private void GetTargetPos()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            AddImpluse(impluseForce, testDir);
+        }
+        if (Input.GetMouseButton(1))
+        {
+            a += Time.deltaTime;
+            a = Mathf.Clamp(a,0, bambooHight);
+            AddForce(a, testDir);
+        }
+        else
+        {
+            StartCoroutine(ImpluseDecrease());
+            a = 0;
+        }
+
     }
 
     // Debug展示使用
@@ -126,13 +177,12 @@ public class Bamboo : MonoBehaviour
         bambooSegments[0] = rootSeg;
 
         // 在鼠标点击的时候，设置最后点的坐标
-        if (isAddForce)
-        {
+     
             int e = bambooSegments.Count - 1;
             BambooSegment endSeg = bambooSegments[e];
-            endSeg.posNow.x = Mathf.SmoothDamp(endSeg.posNow.x, endSeg.posNow.x + horizForcePower, ref velocity, forceIntert);
+            endSeg.posNow.x = Mathf.SmoothDamp(endSeg.posNow.x, endSeg.posNow.x + swingDir * horizForcePower, ref velocity, forceIntert);
             bambooSegments[e] = endSeg;
-        }
+        
 
         // 点之间的约束
         for (int i = 0; i < bambooSegments.Count - 1; i++)
@@ -170,17 +220,17 @@ public class Bamboo : MonoBehaviour
         }
     }
 
+
+
     public struct BambooSegment
     {
         public Vector2 posNow;
         public Vector2 posOld;
-        //public GameObject bambooNode;
 
         public BambooSegment(Vector2 position)
         {
             posNow = position;
             posOld = position;
-            //bambooNode = Instantiate(prefab, position,Quaternion.identity, parent);
         }
     }
 }
