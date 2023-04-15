@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3603111437297068419}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Root
-  m_TagString: Untagged
+  m_TagString: Bamboo
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -39,9 +39,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3603111437567414443}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Bamboo
-  m_TagString: Untagged
+  m_TagString: Bamboo
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -72,9 +72,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3603111438729742963}
   - component: {fileID: 3603111438729742960}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Physics
-  m_TagString: Untagged
+  m_TagString: Bamboo
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -106,15 +106,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3ad9247c3c8a4d4daf11a1929384b8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _cosmatic: {fileID: 1784311359}
   constrainPoint: {fileID: 3603111437567414443}
-  horizForcePower: 3
   vertForcePower: 100
   velocity: 0
   forceIntert: 1
-  _cosmatic: {fileID: 1784311359}
+  swingDampMul: 3
+  swingDir: 0
+  bambooHight: 0
+  forceMaxValue: 3
+  impluseForce: 3
+  testDir: 1
   bambooSegLength: 2
   segmentCount: 7
-  bambooNodePrefab: {fileID: 0}
   segRadius: 0.2
 --- !u!1 &3638692995033567869
 GameObject:
@@ -128,9 +132,9 @@ GameObject:
   - component: {fileID: 5633341452074937334}
   - component: {fileID: 1784311359}
   - component: {fileID: 1196067636}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Cosmatic
-  m_TagString: Untagged
+  m_TagString: Bamboo
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

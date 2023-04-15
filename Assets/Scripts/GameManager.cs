@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
 
     [Header("TEST")]
     public bool isTesting;
+    public int collectionCount;
 
     private FollowCamera _mainCamera;
     private GameObject _player;
@@ -32,7 +33,7 @@ public class GameManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else if(instance != this)
+        else if (instance != this)
         {
             Destroy(gameObject);
         }
@@ -51,12 +52,22 @@ public class GameManager : MonoBehaviour
         }
 #endif
 
+        collectionCount = 0;
     }
 
     private void TestFunction()
+    { 
+        UIManager.instance.ForTest();
+    }
+
+    public void AddCollection()
     {
-        GameStart();
-        UIManager.instance.HideUI(UIManager.instance.StartCanvas, true);
+        collectionCount += 1;
+    }
+
+    public int GetCollectiong()
+    {
+        return collectionCount;
     }
 
     public void WhenPlayerDead()

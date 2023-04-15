@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bamboo : MonoBehaviour,IBamboo
+public class Bamboo : MonoBehaviour,IBamboo,IBorrow
 {
     [Header("Reference")]
     [SerializeField] private BambooCosmatic _cosmatic;
@@ -17,9 +17,9 @@ public class Bamboo : MonoBehaviour,IBamboo
     [SerializeField] private float swingDir;
     [SerializeField] private float bambooHight;
     [SerializeField] private float forceMaxValue;
+    [SerializeField] private float impluseForce;
 
     [Header("Test")]
-    [SerializeField] private float impluseForce;
     [SerializeField] private float testDir;
     
 
@@ -64,9 +64,9 @@ public class Bamboo : MonoBehaviour,IBamboo
         Simulate();
     }
 
-    public void AddImpluse(float force, float dir)
+    public void AddImpluse(float dir)
     {
-        horizForcePower = force;
+        horizForcePower = impluseForce;
         if (dir != 0){
             swingDir = dir > 0 ? 1 : -1;
         }
@@ -75,6 +75,7 @@ public class Bamboo : MonoBehaviour,IBamboo
             swingDir = 0;
         }
         StartCoroutine(ImpluseDecrease());
+        Debug.Log("Ò¡°¡Ò¡");
     }
 
     IEnumerator ImpluseDecrease()
@@ -100,6 +101,7 @@ public class Bamboo : MonoBehaviour,IBamboo
         }
         float force = posY / bambooHight * forceMaxValue;
         horizForcePower = force;
+        Debug.Log("Ò¡°¡Ò¡");
     }
 
     float a = 0;
@@ -107,11 +109,12 @@ public class Bamboo : MonoBehaviour,IBamboo
     {
         if (Input.GetMouseButtonDown(0))
         {
-            AddImpluse(impluseForce, testDir);
+            AddImpluse(testDir);
         }
         if (Input.GetMouseButton(1))
         {
-            a += Time.deltaTime;
+            a += Time.deltaTime * 5;
+            
             a = Mathf.Clamp(a,0, bambooHight);
             AddForce(a, testDir);
         }
@@ -220,7 +223,10 @@ public class Bamboo : MonoBehaviour,IBamboo
         }
     }
 
-
+    public void BorrowPower(float Dir)
+    {
+        AddImpluse(Dir);
+    }
 
     public struct BambooSegment
     {

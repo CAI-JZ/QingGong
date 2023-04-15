@@ -25,6 +25,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private float fadeMul;
     [SerializeField] private float titleHideDelay;
 
+    [Header("Gaming")]
+    [SerializeField] CanvasGroup Gaming;
+    [SerializeField] Text collection;
+
     public CanvasGroup StartCanvas => startCanvas;
 
     private void Awake()
@@ -47,6 +51,7 @@ public class UIManager : MonoBehaviour
             GameManager.instance.PauseGame();
             ShowUI(pauseCanvas);
         }
+        CollectionUpdate();
     }
 
     private void Start()
@@ -56,6 +61,11 @@ public class UIManager : MonoBehaviour
         continueGame.onClick.AddListener(OnBtnContinueGame);
         exit.onClick.AddListener(OnBtnExit);
 
+    }
+
+    private void CollectionUpdate()
+    {
+        collection.text = GameManager.instance.GetCollectiong().ToString();
     }
 
     public void SwitchTitle(int theme)
@@ -75,10 +85,16 @@ public class UIManager : MonoBehaviour
         HideUI(currentTitle.GetComponent<CanvasGroup>(),true);
     }
 
+    public void ForTest()
+    {
+        OnBtnStartGame();
+    }
+
     private void OnBtnStartGame()
     {
         GameManager.instance.GameStart();
         HideUI(startCanvas, false);
+        ShowUI(Gaming);
     }
 
     private void OnBtnExitGame()
