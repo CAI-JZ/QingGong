@@ -184,7 +184,7 @@ public class MovementController : MonoBehaviour
 
     private void HandleMove()
     {
-        if (isStandOnBamboo && !isJumping && canMoveOn && !isDashing)
+        if (isStandOnBamboo && !isJumping && !isDashing)
         {
             velocity = bambooNormalDir * -currentSpeedX;
         }
@@ -407,6 +407,7 @@ public class MovementController : MonoBehaviour
         yield return new WaitForSeconds(dashTime);
 
         canDoubleJump = true;
+        currentStamina = staminaMaxValue;
         canDash = false;
         useGravity = true;
         isDashing = false;
@@ -421,7 +422,8 @@ public class MovementController : MonoBehaviour
     }
 
 
-    float hight = 0;
+    [SerializeField] float hight = 0;
+    [SerializeField] float hightMul = 4;
     private void BambooWalk()
     {
         if (!isbamboo && !isStandOnBamboo)
@@ -432,14 +434,17 @@ public class MovementController : MonoBehaviour
         }
         if (inputDir.y > 0 && inputDir.x != 0)
         {
-            hight += Time.deltaTime * 10;
+            hight += Time.deltaTime * hightMul;
             RaycastHit2D hit = Physics2D.Raycast(transform.position + Vector3.down * 0.8f, Vector2.down, 1f, (1 << 6));
             Debug.DrawLine(transform.position + Vector3.down * 0.7f, transform.position + Vector3.down * (0.5f + 0.8f), Color.green, 1);
+            isbamboo.collider.transform.parent.GetComponentInChildren<Bamboo>().AddForce(hight, inputDir.x);
+            isWalkBamboo = true;
             if (!hit)
             {
                 currentSpeedX = 0;
                 currentSpeedY = wallSlideSpeed;
                 isStandOnBamboo = false;
+                Debug.Log("沿着竹子往上爬。");
             }
             else
             {
@@ -447,11 +452,9 @@ public class MovementController : MonoBehaviour
                 bambooNormalDir = Vector2.Perpendicular(hit.normal).normalized;
                 Debug.DrawRay(hit.point, bambooNormalDir, Color.red);
                 Debug.DrawRay(hit.point, hit.normal, Color.white);
-
+                Debug.Log("沿着竹子爬。");
             }
             
-            isbamboo.collider.transform.parent.GetComponentInChildren<Bamboo>().AddForce(hight, inputDir.x);
-            isWalkBamboo = true;
         }
         else
         {
@@ -474,9 +477,10 @@ public class MovementController : MonoBehaviour
         if (bambooJumpTimer > 0)
         {
             isBambooJumping = true;
+            float mul = hight > 1 ? hight : 1;
             float normal = inputDir.x > 0 ? -1 : 1;
-            currentSpeedX = Mathf.Lerp(currentSpeedX, normal * bambooJumpPower.x, bambooJumpTimer);
-            currentSpeedY = Mathf.Lerp(currentSpeedY, bambooJumpPower.y, bambooJumpTimer);
+            currentSpeedX = Mathf.Lerp(currentSpeedX, normal * bambooJumpPower.x * mul, bambooJumpTimer);
+            currentSpeedY = Mathf.Lerp(currentSpeedY, bambooJumpPower.y* mul, bambooJumpTimer);
         }
         else
         {
@@ -651,7 +655,8 @@ public class MovementController : MonoBehaviour
 
 #if UNITY_EDITOR
         //Debug.DrawLine(transform.position + Vector3.down * 0.7f, transform.position + Vector3.down * (rayDisDown+0.8f), Color.red, 1);
-        //Debug.DrawLine(transform.position+ Vector3.down * 0.8f, transform.position + Vector3.down * 0.8f + Vector3.right * rayDis, Color.red, 1);
+        Debug.DrawLine(transform.position+ Vector3.down * 0.8f, transform.position + Vector3.down * 0.8f + Vector3.right * rayDis, Color.red, 1);
+        Debug.DrawLine(transform.position + Vector3.down * 0.8f, transform.position + Vector3.down * 0.8f + Vector3.left * rayDis, Color.red, 1);
         //Debug.DrawLine(bambooDetect.position, bambooDetect.position + Vector3.right * bambooDecRadis, Color.green, 1);
         Debug.DrawLine(rechargeCheck.position, rechargeCheck.position + Vector3.right * rechargeCheckDis, Color.red, 1);
 #endif
