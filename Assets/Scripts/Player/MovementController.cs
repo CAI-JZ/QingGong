@@ -34,7 +34,6 @@ public class MovementController : MonoBehaviour
     private float apexPoint;
     private bool isJumping;
     private bool canDoubleJump;
-    [SerializeField] private AudioSource jumpSound;
 
     [Header("DASH")]
     [SerializeField] private Vector2 dashDir;
@@ -72,13 +71,11 @@ public class MovementController : MonoBehaviour
     [SerializeField] public float moveClamp = 13f;
 
     [Header("SLOPE MOVE")]
-    [SerializeField] private float slopeCheckDis;
     [SerializeField] private float maxSlopeAngle;
     private Vector2 slopeNormalDir;
     [SerializeField] private float slopeDownAngle;
     [SerializeField] private bool isOnSlope;
     private bool canMoveOn;
-    private float slopeDownAngleOld;
     private float slopeSideAngle;
 
     [Header("BAMBOO")]
@@ -92,6 +89,7 @@ public class MovementController : MonoBehaviour
     private bool isWalkBamboo;
     private bool isStandOnBamboo;
     private RaycastHit2D isbamboo;
+    private bool isTouchBamboo;
 
     [Header("RAY")]
     //RayCast
@@ -103,8 +101,6 @@ public class MovementController : MonoBehaviour
 
 
     [Header("Player State")]
-    [SerializeField] private bool grounded;
-    [SerializeField] private bool rightRay;
     [SerializeField] private bool useGravity;
     [SerializeField] private bool isControllable;
     [SerializeField] private bool canInput;
@@ -121,7 +117,7 @@ public class MovementController : MonoBehaviour
     public bool IsWallJumping => isWallJumping;
     public Vector2 Velocity => velocity;
     public bool IsJumping => isJumping;
-    public bool Grounded => grounded;
+    public bool Grounded => downHit;
 
     public bool IsControllable => isControllable;
 
@@ -138,6 +134,8 @@ public class MovementController : MonoBehaviour
         isControllable = true;
     }
 
+
+    [SerializeField] GameObject test;
     private void Update()
     {
         if (!isControllable)
@@ -148,14 +146,11 @@ public class MovementController : MonoBehaviour
         InputDetector();
         FlipPlayerDir();
 
-#if UNITY_EDITOR
-        grounded = downHit;
-        rightRay = rightHit;
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             Dash();
         }
-#endif
+
         CalculateWalkSpeed();
         CalculateJumpApex();
         Gravity();
@@ -253,7 +248,6 @@ public class MovementController : MonoBehaviour
             {
                 if (jumpInputBufferTimer > 0.01f && coyoteJumpTimer > 0.01f)
                 {
-                    jumpSound.Play();
                     isJumping = true;
                     currentSpeedY = jumpHight;
                     jumpInputBufferTimer = -0.1f;
@@ -302,7 +296,6 @@ public class MovementController : MonoBehaviour
         //Inputbuffer
         if (jumpInputDown)
         {
-            slopeDownAngleOld = 0;
             jumpInputBufferTimer = jumpInputBuffer;
         }
         else
@@ -439,8 +432,8 @@ public class MovementController : MonoBehaviour
         }
         if (inputDir.y > 0 && inputDir.x != 0)
         {
-            hight += Time.deltaTime * 20;
-            RaycastHit2D hit = Physics2D.Raycast(transform.position + Vector3.down * 0.8f, Vector2.down, 0.5f, (1 << 6));
+            hight += Time.deltaTime * 10;
+            RaycastHit2D hit = Physics2D.Raycast(transform.position + Vector3.down * 0.8f, Vector2.down, 1f, (1 << 6));
             Debug.DrawLine(transform.position + Vector3.down * 0.7f, transform.position + Vector3.down * (0.5f + 0.8f), Color.green, 1);
             if (!hit)
             {
@@ -457,7 +450,7 @@ public class MovementController : MonoBehaviour
 
             }
             
-            //isbamboo.collider.transform.parent.GetComponentInChildren<Bamboo>().AddForce(hight, inputDir.x);
+            isbamboo.collider.transform.parent.GetComponentInChildren<Bamboo>().AddForce(hight, inputDir.x);
             isWalkBamboo = true;
         }
         else
@@ -580,19 +573,16 @@ public class MovementController : MonoBehaviour
     private void SlopeCheck()
     {
         SlopeCheckVertial();
-        //SlopeCheckHorizontal();
+        SlopeCheckHorizontal();
     }
 
     private void SlopeCheckHorizontal()
     {
-        RaycastHit2D hitFront = Physics2D.Raycast(transform.position, transform.right, slopeCheckDis, 1 << 7);
-        RaycastHit2D hitBack = Physics2D.Raycast(transform.position, -transform.right, slopeCheckDis, 1 << 7);
-
-        if (hitFront || hitBack)
+        if (rightHit || leftHit)
         {
-            isOnSlope = true;
-            RaycastHit2D hit = hitFront ? hitFront : hitBack;
+            RaycastHit2D hit = rightHit ? rightHit : leftHit;
             slopeSideAngle = Vector2.Angle(hit.normal, Vector2.up);
+            isOnSlope = slopeSideAngle < 90 ? true : false;
         }
         else
         {
@@ -603,13 +593,12 @@ public class MovementController : MonoBehaviour
 
     private void SlopeCheckVertial()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, slopeCheckDis, 1 << 7);
+        RaycastHit2D hit = downHit;
 
         if (!hit) return;
-        //Debug.DrawRay(hit.point, slopeNormalDir, Color.green);
-        //Debug.DrawRay(hit.point, hit.normal, Color.white);
         slopeNormalDir = Vector2.Perpendicular(hit.normal).normalized;
         slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
+        Debug.Log(slopeDownAngle);
         if (slopeDownAngle > 0)
         {
             isOnSlope = true;
@@ -619,7 +608,6 @@ public class MovementController : MonoBehaviour
         {
             isOnSlope = false;
         }
-        //slopeDownAngleOld = slopeDownAngle;
     }
     #endregion
 

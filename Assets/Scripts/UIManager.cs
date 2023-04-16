@@ -48,8 +48,11 @@ public class UIManager : MonoBehaviour
     {
         if (PlayerInput._instance.Pause && GameManager.instance.currentState != GameState.PAUSE)
         {
-            GameManager.instance.PauseGame();
             ShowUI(pauseCanvas);
+            if (pauseCanvas.alpha == 1)
+            { 
+                GameManager.instance.PauseGame();
+            }
         }
         CollectionUpdate();
     }
@@ -104,8 +107,8 @@ public class UIManager : MonoBehaviour
 
     private void OnBtnContinueGame()
     {
-        HideUI(pauseCanvas, true);
         GameManager.instance.ContinueGame();
+        HideUI(pauseCanvas, false);
     }
 
     private void OnBtnExit()
