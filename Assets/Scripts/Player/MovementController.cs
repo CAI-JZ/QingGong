@@ -43,6 +43,7 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float rechargeTime = 0.2f;
     [SerializeField] private Transform rechargeCheck;
     [SerializeField] private float rechargeCheckDis;
+    private float dashTimer;
 
     [Header("Wall Jump & Wall Slide")]
     [SerializeField] private float wallSlideSpeed = 2f;
@@ -146,17 +147,16 @@ public class MovementController : MonoBehaviour
         InputDetector();
         FlipPlayerDir();
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            Dash();
-        }
+        //if (Input.GetKeyDown(KeyCode.LeftShift))
+        //{
+        //    Dash();
+        //}
 
         CalculateWalkSpeed();
         CalculateJumpApex();
         Gravity();
         JumpOptimation();
-        RecharegeCheck();
-        Dash();
+        DashEvent();
 
         SlopeCheck();
         Jump();
@@ -346,16 +346,25 @@ public class MovementController : MonoBehaviour
     #region DASH
 
     private bool borrrowPower;
-    private bool dash => PlayerInput._instance.Dash && canDash && downHit && !isWallSliding;
+    private bool dash => dashInput && canDash && downHit && !isWallSliding ;
     private bool borrow => borrrowPower && !isWallSliding;
 
+    private bool doubleCheck => rightHit && currentSpeedX >0 && !isOnSlope || leftHit && currentSpeedX <0 && !isOnSlope;
 
     //增加一个检测、增加一个banboo的晃动
+
+    private void DashEvent()
+    {
+        RecharegeCheck();
+        DashInput();
+        DashHandle();
+    }
 
     private void RecharegeCheck()
     {
         if (!dashInput)
         {
+            borrrowPower = false;
             return;
         }
         else
@@ -387,31 +396,66 @@ public class MovementController : MonoBehaviour
         }
     }
 
-    private void Dash()
+    private void DashInput()
     {
         if (dash || borrow)
         {
-            float inputx = inputDir.x > 0 ? 1 : -1;
-            float dirX = inputDir.x != 0 ? inputx : transform.localScale.x;
-            float dirY = inputDir.x != 0 ? 1 : 0;
-            StartCoroutine(Dashing(dirX, dirY));
+            dashTimer = dashTime;
+            isDashing = true;
+        }
+        else
+        {
+            dashTimer -= Time.deltaTime;
+            dashTimer = Mathf.Clamp(dashTimer, -0.1f, dashTime);
         }
     }
 
-    IEnumerator Dashing(float dirX, float dirY)
+    private void DashHandle()
     {
-        isDashing = true;
-        useGravity = false;
-        currentSpeedX = dirX * dashDir.x;
-        currentSpeedY = dirY * dashDir.y;
-        yield return new WaitForSeconds(dashTime);
+        if (!isDashing)
+        {
+            return;
+        }
+        DoubleCheck();
+       
+        
+        if (dashTimer < 0)
+        {
+            EndDash();
+            return;
+        }
+        else
+        {
+            float inputx = inputDir.x > 0 ? 1 : -1;
+            float dirX = inputDir.x != 0 ? inputx : transform.localScale.x;
+            float dirY = 1;
 
+            useGravity = false;
+            currentSpeedX = dirX * dashDir.x;
+            currentSpeedY = dirY * dashDir.y;
+        }
+    }
+
+    private void DoubleCheck()
+    {
+        if (doubleCheck)
+        {
+            currentSpeedX = 0;
+            currentSpeedY = 0;
+            EndDash();
+            dashTimer = -0.1f;
+            return;
+        }
+    }
+
+    private void EndDash()
+    {
+        useGravity = true;
         canDoubleJump = true;
         currentStamina = staminaMaxValue;
         canDash = false;
-        useGravity = true;
-        isDashing = false;
         borrrowPower = false;
+        isDashing = false;
     }
     #endregion
 
