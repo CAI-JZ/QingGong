@@ -548,7 +548,7 @@ public class MovementController : MonoBehaviour
     {
         canWallSlide = isWalled && inputDir.x != 0f && inputDir.y >0 ? true : false;
 
-        if (canWallSlide)
+        if (canWallSlide && !isOnSlope)
         {
             if ( currentStamina < 0)
             {
