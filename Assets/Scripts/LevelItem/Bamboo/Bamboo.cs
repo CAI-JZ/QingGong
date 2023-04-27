@@ -60,7 +60,9 @@ public class Bamboo : MonoBehaviour,IBamboo,IBorrow
 
     private void Update()
     {
+#if UNITY_EDITOR
         GetTargetPos();
+#endif
         Simulate();
     }
 
@@ -75,7 +77,6 @@ public class Bamboo : MonoBehaviour,IBamboo,IBorrow
             swingDir = 0;
         }
         StartCoroutine(ImpluseDecrease());
-        Debug.Log("Ò¡°¡Ò¡");
     }
 
     IEnumerator ImpluseDecrease()
@@ -101,7 +102,7 @@ public class Bamboo : MonoBehaviour,IBamboo,IBorrow
         }
         float force = posY / bambooHight * forceMaxValue;
         horizForcePower = force;
-        Debug.Log("Ò¡°¡Ò¡");
+        
     }
 
     float a = 0;

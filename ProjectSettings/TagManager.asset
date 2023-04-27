@@ -60,6 +60,9 @@ TagManager:
   - name: Front
     uniqueID: 1891091825
     locked: 0
+  - name: Wind
+    uniqueID: 3167618399
+    locked: 0
   - name: Player
     uniqueID: 1157915551
     locked: 0

@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     private GameState gameState;
 
     public GameState currentState { get { return gameState; } }
+    public GameObject firstTutorial;
 
     [Header("TEST")]
     public bool isTesting;
@@ -44,6 +45,7 @@ public class GameManager : MonoBehaviour
         gameState = GameState.BEFORE_START;
         _mainCamera = GetComponent<FollowCamera>();
         _player = GameObject.FindGameObjectWithTag("Player");
+        firstTutorial.SetActive(false);
 
 #if UNITY_EDITOR
         if (isTesting)
@@ -94,6 +96,7 @@ public class GameManager : MonoBehaviour
         gameState = GameState.GAMING;
         _player.GetComponent<MovementController>().GameStart();
         _mainCamera.GameStart();
+        firstTutorial.SetActive(true);
     }
 
     public void ExitGame()

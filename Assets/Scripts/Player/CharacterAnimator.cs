@@ -10,6 +10,7 @@ public class CharacterAnimator : MonoBehaviour
 
     bool isRun;
     bool isAir;
+    bool isWallRun;
 
 
     private void Awake()
@@ -20,7 +21,7 @@ public class CharacterAnimator : MonoBehaviour
 
     private void Start()
     {
-        
+
     }
 
     private void Update()
@@ -33,8 +34,9 @@ public class CharacterAnimator : MonoBehaviour
 
         isRun = PlayerInput._instance.HorizontalInput != 0;
         isAir = !controller.Grounded;
+        isWallRun = controller.IsWallSliding || controller.IsWalkBamboo;
 
-        _animator.SetBool("isWallRuning", controller.IsWallSliding);
+        _animator.SetBool("isWallRuning", isWallRun);
         _animator.SetBool("isRun", isRun);
         _animator.SetBool("isAir", isAir);
         _animator.SetBool("isDown", controller.Velocity.y < 0);

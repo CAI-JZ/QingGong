@@ -118,6 +118,7 @@ public class UIManager : MonoBehaviour
 
     public void HideUI(CanvasGroup canvasGroup, bool isActive)
     {
+        StopAllCoroutines();
         StartCoroutine(DecreaseAlpha(canvasGroup));
         if (!isActive)
         {
@@ -125,12 +126,13 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void ShowUI(CanvasGroup canvasGroup)
+    public void ShowUI(CanvasGroup canvasGroup)
     {
         if (!canvasGroup.gameObject.activeSelf)
         {
             canvasGroup.gameObject.SetActive(true);
         }
+        StopAllCoroutines();
         StartCoroutine(IncreaseAlpha(canvasGroup));
     }
 

@@ -25,7 +25,7 @@ public class WindController : MonoBehaviour
 
     private void RandomWind()
     {
-        int count = Random.Range(1, Winds.Length-1);
+        int count = Random.Range(1, Winds.Length-2);
         for (int i = 0; i < count; i++)
         {
             int w = Random.Range(0, Winds.Length - 1);

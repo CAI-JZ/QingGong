@@ -84,6 +84,7 @@ public class MovementController : MonoBehaviour
     [SerializeField] private Transform bambooDetect;
     [SerializeField] private Vector2 bambooJumpPower;
     [SerializeField] private float bambooJumpDuration;
+    [SerializeField] private float bendMul;
     private Vector2 bambooNormalDir;
     private float bambooJumpTimer = -0.1f;
     private bool isBambooJumping;
@@ -115,11 +116,11 @@ public class MovementController : MonoBehaviour
 
     // reference
     public bool IsWallSliding => isWallSliding;
+    public bool IsWalkBamboo => isWalkBamboo;
     public bool IsWallJumping => isWallJumping;
     public Vector2 Velocity => velocity;
     public bool IsJumping => isJumping;
     public bool Grounded => downHit;
-
     public bool IsControllable => isControllable;
 
     private void Awake()
@@ -147,11 +148,6 @@ public class MovementController : MonoBehaviour
         InputDetector();
         FlipPlayerDir();
 
-        //if (Input.GetKeyDown(KeyCode.LeftShift))
-        //{
-        //    Dash();
-        //}
-
         CalculateWalkSpeed();
         CalculateJumpApex();
         Gravity();
@@ -172,6 +168,7 @@ public class MovementController : MonoBehaviour
         currentStamina = staminaMaxValue;
         currentWallSpeed = wallSlideSpeed;
         canDash = true;
+        climbHight = 0;
 
     }
 
@@ -257,27 +254,10 @@ public class MovementController : MonoBehaviour
                     isJumpEarlyUp = true;
                 }
             }
-            if (velocity.y < 0)
-            {
-                DoubleJump();
-            }
-
         }
     }
 
-    private void DoubleJump()
-    {
-        if (jumpInputBufferTimer > 0.01f && canDoubleJump)
-        {
-            canDoubleJump = false;
-            StopAllCoroutines();
-            useGravity = true;
-            isDashing = false;
-            isJumping = true;
-
-            currentSpeedY = doubleJumpHight;
-        }
-    }
+   
 
     private void JumpOptimation()
     {
@@ -285,7 +265,6 @@ public class MovementController : MonoBehaviour
         if (downHit)
         {
             coyoteJumpTimer = coyoteJump;
-            canDoubleJump = true;
         }
         else
         {
@@ -358,6 +337,7 @@ public class MovementController : MonoBehaviour
         RecharegeCheck();
         DashInput();
         DashHandle();
+        DoubleJump();
     }
 
     private void RecharegeCheck()
@@ -436,6 +416,19 @@ public class MovementController : MonoBehaviour
         }
     }
 
+    private void DoubleJump()
+    {
+        if (jumpInputBufferTimer > 0.01f && canDoubleJump)
+        {
+            canDoubleJump = false;
+            useGravity = true;
+            isDashing = false;
+            isJumping = true;
+
+            currentSpeedY = doubleJumpHight;
+        }
+    }
+
     private void DoubleCheck()
     {
         if (doubleCheck)
@@ -466,29 +459,42 @@ public class MovementController : MonoBehaviour
     }
 
 
-    [SerializeField] float hight = 0;
+    [SerializeField] float power = 0;
+    [SerializeField] float climbHight = 0;
     [SerializeField] float hightMul = 4;
+    [SerializeField] float hightMaxValue = 3;
     private void BambooWalk()
     {
-        if (!isbamboo && !isStandOnBamboo)
+        if (!isbamboo && !isStandOnBamboo || currentStamina <=0)
         {
             isWalkBamboo = false;
-            hight = 0;
+            power = 0;
             return;
         }
         if (inputDir.y > 0 && inputDir.x != 0)
         {
-            hight += Time.deltaTime * hightMul;
+            power += Time.deltaTime * hightMul;
+            climbHight += Time.deltaTime * hightMul;
+            climbHight = Mathf.Clamp(climbHight, 0, hightMaxValue);
             RaycastHit2D hit = Physics2D.Raycast(transform.position + Vector3.down * 0.8f, Vector2.down, 1f, (1 << 6));
             Debug.DrawLine(transform.position + Vector3.down * 0.7f, transform.position + Vector3.down * (0.5f + 0.8f), Color.green, 1);
-            isbamboo.collider.transform.parent.GetComponentInChildren<Bamboo>().AddForce(hight, inputDir.x);
+
+            
+            if (!isbamboo.collider.transform.parent.GetChild(0).TryGetComponent<Bamboo>(out Bamboo b))
+            {
+                Debug.Log("找不到对象");
+                return;
+            }
+
+            b.AddForce(power, inputDir.x);
+            WallStaminaDecrease(wallStaminaMul);
             isWalkBamboo = true;
             if (!hit)
             {
                 currentSpeedX = 0;
                 currentSpeedY = wallSlideSpeed;
                 isStandOnBamboo = false;
-                Debug.Log("沿着竹子往上爬。");
+                
             }
             else
             {
@@ -521,7 +527,7 @@ public class MovementController : MonoBehaviour
         if (bambooJumpTimer > 0)
         {
             isBambooJumping = true;
-            float mul = hight > 1 ? hight : 1;
+            float mul = climbHight > 1 ? climbHight * bendMul : 1;
             float normal = inputDir.x > 0 ? -1 : 1;
             currentSpeedX = Mathf.Lerp(currentSpeedX, normal * bambooJumpPower.x * mul, bambooJumpTimer);
             currentSpeedY = Mathf.Lerp(currentSpeedY, bambooJumpPower.y* mul, bambooJumpTimer);
@@ -646,7 +652,6 @@ public class MovementController : MonoBehaviour
         if (!hit) return;
         slopeNormalDir = Vector2.Perpendicular(hit.normal).normalized;
         slopeDownAngle = Vector2.Angle(hit.normal, Vector2.up);
-        Debug.Log(slopeDownAngle);
         if (slopeDownAngle > 0)
         {
             isOnSlope = true;
