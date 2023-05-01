@@ -49,7 +49,7 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float wallSlideSpeed = 2f;
     [SerializeField] private float wallJumpTime = 0.2f;
     [SerializeField] private Vector2 wallJumpPower = new Vector2(8f, 16f);
-    [SerializeField]private bool isWallSliding;
+    [SerializeField] private bool isWallSliding;
     private bool isWallJumping;
     private bool canWallSlide;
     private float wallJumpWindow = 0.1f;
@@ -98,14 +98,18 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float rayDis = 0.5f;
     [SerializeField] private float rayDisDown = 1f;
     [SerializeField] private Transform climbableCheck;
+    [SerializeField] private Transform headCheck;
+    [SerializeField] private float headCheckDis;
     private RaycastHit2D rightHit, leftHit, upHit, downHit;
     private RaycastHit2D isClimbable;
+    
 
 
     [Header("Player State")]
     [SerializeField] private bool useGravity;
     [SerializeField] private bool isControllable;
     [SerializeField] private bool canInput;
+    [SerializeField] private bool isHitUp;
 
     //Input
     private bool jumpInputUp;
@@ -146,6 +150,7 @@ public class MovementController : MonoBehaviour
             return;
         }
         RayDetector();
+        HeadCheck();
         InputDetector();
         FlipPlayerDir();
 
@@ -161,6 +166,12 @@ public class MovementController : MonoBehaviour
         BambooEvent();
         CharacterMove();
         Physics2D.SyncTransforms();
+
+        isHitUp = upHit;
+        if (isHitUp)
+        {
+            Debug.Log("磕脑袋了");
+        }
     }
 
 
@@ -258,7 +269,7 @@ public class MovementController : MonoBehaviour
         }
     }
 
-   
+
 
     private void JumpOptimation()
     {
@@ -326,10 +337,10 @@ public class MovementController : MonoBehaviour
     #region DASH
 
     private bool borrrowPower;
-    private bool dash => dashInput && canDash && downHit && !isWallSliding ;
+    private bool dash => dashInput && canDash && downHit && !isWallSliding;
     private bool borrow => borrrowPower && !isWallSliding;
 
-    private bool doubleCheck => rightHit && currentSpeedX >0 && !isOnSlope || leftHit && currentSpeedX <0 && !isOnSlope;
+    private bool doubleCheck => (rightHit && playerDir == CharDir.Right && !isOnSlope) || (leftHit && playerDir == CharDir.Left/*currentSpeedX < 0*/ && !isOnSlope);
 
     //增加一个检测、增加一个banboo的晃动
 
@@ -434,9 +445,10 @@ public class MovementController : MonoBehaviour
     {
         if (doubleCheck)
         {
+            Debug.Log("不能前进了");
+            EndDash();
             currentSpeedX = 0;
             currentSpeedY = 0;
-            EndDash();
             dashTimer = -0.1f;
             return;
         }
@@ -445,11 +457,11 @@ public class MovementController : MonoBehaviour
     private void EndDash()
     {
         useGravity = true;
+        isDashing = false;
         canDoubleJump = true;
         currentStamina = staminaMaxValue;
         canDash = false;
         borrrowPower = false;
-        isDashing = false;
     }
     #endregion
 
@@ -672,10 +684,12 @@ public class MovementController : MonoBehaviour
         if (velocity.x > 0)
         {
             transform.localScale = new Vector3(1, 1, 1);
+            playerDir = CharDir.Right;
         }
         else if (velocity.x < 0)
         {
             transform.localScale = new Vector3(-1, 1, 1);
+            playerDir = CharDir.Left;
         }
     }
 
@@ -695,14 +709,28 @@ public class MovementController : MonoBehaviour
         dashInput = PlayerInput._instance.Dash;
     }
 
+    private void HeadCheck()
+    {
+        if (upHit)
+        {
+            if (upHit.collider.tag == "Wall")
+            {
+                currentSpeedY = 0;
+                EndDash();
+            }
+            
+        }
+    }
+
     private void RayDetector()
     {
         rightHit = Physics2D.Raycast(transform.position+Vector3.down * 0.8f, Vector2.right, rayDis, (1 << 7));
         leftHit = Physics2D.Raycast(transform.position + Vector3.down * 0.8f, Vector2.left, rayDis, (1 << 7));
-        upHit = Physics2D.Raycast(transform.position, Vector2.up, rayDis, (1 << 7));
+        upHit = Physics2D.Raycast(transform.position + Vector3.up*0.7f, Vector3.up, rayDisDown, (1 << 7));
         downHit = Physics2D.Raycast(transform.position + Vector3.down * 0.8f, Vector2.down, rayDisDown, (1 << 7));
         isbamboo = Physics2D.Raycast(bambooDetect.position, Vector2.right, bambooDecRadis, (1 << 6));
         isClimbable = Physics2D.Raycast(climbableCheck.position, Vector2.right, bambooDecRadis, (1 << 8));
+
 
 #if UNITY_EDITOR
         //Debug.DrawLine(transform.position + Vector3.down * 0.7f, transform.position + Vector3.down * (rayDisDown+0.8f), Color.red, 1);

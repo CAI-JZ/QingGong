@@ -9,14 +9,21 @@ public class SwitchPart : MonoBehaviour
 
     [SerializeField] AudioSource switchAudio;
 
+    [SerializeField] private BoxCollider2D trigger;
+
+    private void Start()
+    {
+        trigger = GetComponent<BoxCollider2D>();
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Player")
         {
             switchAudio.Play();
             float t = switchAudio.clip.length;
-            Debug.Log(t);
             UIManager.instance.SwitchTitle(partNum);
+            trigger.enabled = false;
             Invoke("SetUnactive", t);
         }
     }

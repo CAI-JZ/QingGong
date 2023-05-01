@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24771b1f0ccf45341bb8e03fa6e570c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resistance: 150
+  resistance: 200
   waveIndex: 0
 --- !u!58 &-1984422208207539844
 CircleCollider2D:

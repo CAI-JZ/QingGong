@@ -7,6 +7,7 @@ public class CharacterAnimator : MonoBehaviour
     [Header("Reference")]
     [SerializeField] private MovementController controller;
     [SerializeField] private Animator _animator;
+    [SerializeField] private ParticleSystem dashParticle;
 
     public FootstepAudioData footstepAudioData;
     public AudioSource currentFootAuido;
@@ -38,6 +39,7 @@ public class CharacterAnimator : MonoBehaviour
 
         AnimatiorCheck();
         SetAnimation();
+        //VFXHandler();
         SoundHandler();
     }
 
@@ -68,6 +70,13 @@ public class CharacterAnimator : MonoBehaviour
         }
     }
 
+    private void VFXHandler()
+    {
+        if (isDash)
+        {
+            dashParticle.Play();
+        }
+    }
     private void SoundHandler()
     {
         if (isDash)
