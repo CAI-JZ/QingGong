@@ -49,7 +49,7 @@ public class MovementController : MonoBehaviour
     [SerializeField] private float wallSlideSpeed = 2f;
     [SerializeField] private float wallJumpTime = 0.2f;
     [SerializeField] private Vector2 wallJumpPower = new Vector2(8f, 16f);
-    public bool isWallSliding;
+    [SerializeField]private bool isWallSliding;
     private bool isWallJumping;
     private bool canWallSlide;
     private float wallJumpWindow = 0.1f;
@@ -118,6 +118,7 @@ public class MovementController : MonoBehaviour
     public bool IsWallSliding => isWallSliding;
     public bool IsWalkBamboo => isWalkBamboo;
     public bool IsWallJumping => isWallJumping;
+    public bool IsDashing => isDashing;
     public Vector2 Velocity => velocity;
     public bool IsJumping => isJumping;
     public bool Grounded => downHit;
@@ -380,8 +381,8 @@ public class MovementController : MonoBehaviour
     {
         if (dash || borrow)
         {
-            dashTimer = dashTime;
             isDashing = true;
+            dashTimer = dashTime;
         }
         else
         {
@@ -480,9 +481,10 @@ public class MovementController : MonoBehaviour
             Debug.DrawLine(transform.position + Vector3.down * 0.7f, transform.position + Vector3.down * (0.5f + 0.8f), Color.green, 1);
 
             
-            if (!isbamboo.collider.transform.parent.GetChild(0).TryGetComponent<Bamboo>(out Bamboo b))
+            if (!isbamboo || !isbamboo.collider.transform.parent.GetChild(0).TryGetComponent<Bamboo>(out Bamboo b))
             {
                 Debug.Log("找不到对象");
+                isWalkBamboo = false;
                 return;
             }
 

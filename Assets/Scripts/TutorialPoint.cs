@@ -11,7 +11,6 @@ public class TutorialPoint : MonoBehaviour
     {
         if (collision.tag == "Player")
         {
-            Debug.Log("Show Tutorial");
             UIManager.instance.ShowUI(currentTutorial);
         }
     }
@@ -20,8 +19,7 @@ public class TutorialPoint : MonoBehaviour
     {
         if (collision.tag == "Player")
         {
-            Debug.Log("Hide Tutorial");
-            UIManager.instance.HideUI(currentTutorial, true);
+            UIManager.instance.HideUI(currentTutorial, false);
         }
     }
 

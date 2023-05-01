@@ -96,9 +96,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24771b1f0ccf45341bb8e03fa6e570c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resistance: 100
+  resistance: 150
   waveIndex: 0
-  wavePerfab: {fileID: 293463287242656724, guid: 572e1ebae41848346a7de9ce7efaf63b, type: 3}
 --- !u!58 &-1984422208207539844
 CircleCollider2D:
   m_ObjectHideFlags: 0

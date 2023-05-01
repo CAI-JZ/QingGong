@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     public bool isTesting;
     public int collectionCount;
 
-    private FollowCamera _mainCamera;
+    [SerializeField] private FollowCamera _mainCamera;
     private GameObject _player;
     private Vector3 currentCheckPoint;
 
@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else if (instance != this)
         {

@@ -70,7 +70,7 @@ TrailRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1157915551
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Time: 0.6
   m_Parameters:
@@ -350,6 +350,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6402379329267002878}
   - component: {fileID: 6113898133416680325}
+  - component: {fileID: 1180289659}
   m_Layer: 3
   m_Name: Visual
   m_TagString: Untagged
@@ -387,6 +388,104 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 0}
   _animator: {fileID: 0}
+  footstepAudioData: {fileID: 11400000, guid: 3de37d8245bc81040a23ed475ed97d00, type: 2}
+  currentFootAuido: {fileID: 1180289659}
+--- !u!82 &1180289659
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6402379329267002879}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &6402379329850656938
 GameObject:
   m_ObjectHideFlags: 0
@@ -444,7 +543,7 @@ MonoBehaviour:
   currentStamina: 0
   wallStaminaMul: 50
   playerDir: 0
-  jumpHight: 20
+  jumpHight: 25
   doubleJumpHight: 15
   jumpApexThreshold: 10
   jumpEarlyMul: 3
@@ -459,32 +558,34 @@ MonoBehaviour:
   rechargeCheckDis: 1
   wallSlideSpeed: 8
   wallJumpTime: 0.15
-  wallJumpPower: {x: 20, y: 25}
+  wallJumpPower: {x: 25, y: 22}
   isWallSliding: 0
   gravityClamp: -30
   minFallGravity: 80
   maxFallGraviyt: 120
   fallGravity: 0
   moveAcceleration: 100
-  deAcceleration: 150
+  deAcceleration: 200
   moveClamp: 13
-  slopeCheckDis: 0.5
-  maxSlopeAngle: 45
-  slopeCheck: {fileID: 2327109615239282437}
+  maxSlopeAngle: 75
   slopeDownAngle: 0
   isOnSlope: 0
   bambooDecRadis: 0.05
   bambooDetect: {fileID: 4240488484828180140}
-  bambooJumpPower: {x: 30, y: 20}
+  bambooJumpPower: {x: 35, y: 42}
   bambooJumpDuration: 0.2
-  rayDis: 0.65
+  bendMul: 0.5
+  rayDis: 0.7
   rayDisDown: 0.4
   climbableCheck: {fileID: 2166319683506230860}
-  grounded: 0
-  rightRay: 0
   useGravity: 0
   isControllable: 0
   canInput: 0
+  test: {fileID: 0}
+  power: 0
+  climbHight: 0
+  hightMul: 8
+  hightMaxValue: 3
 --- !u!70 &302496640
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -592,7 +693,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1157915551
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 399cdaf4bc76f2c45a38c796531481dc, type: 3}
   m_Color: {r: 0.9811321, g: 0.9743444, b: 0.96724814, a: 1}

@@ -29,6 +29,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] CanvasGroup Gaming;
     [SerializeField] Text collection;
 
+    bool endAlphaDec;
+
     public CanvasGroup StartCanvas => startCanvas;
 
     private void Awake()
@@ -36,7 +38,7 @@ public class UIManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
         else if (instance != this)
         {
@@ -118,7 +120,7 @@ public class UIManager : MonoBehaviour
 
     public void HideUI(CanvasGroup canvasGroup, bool isActive)
     {
-        StopAllCoroutines();
+        //StopAllCoroutines();
         StartCoroutine(DecreaseAlpha(canvasGroup));
         if (!isActive)
         {
@@ -132,7 +134,7 @@ public class UIManager : MonoBehaviour
         {
             canvasGroup.gameObject.SetActive(true);
         }
-        StopAllCoroutines();
+        //StopAllCoroutines();
         StartCoroutine(IncreaseAlpha(canvasGroup));
     }
 
@@ -146,6 +148,7 @@ public class UIManager : MonoBehaviour
         }
 
         canvas.alpha = 0;
+       
     }
 
     IEnumerator IncreaseAlpha(CanvasGroup canvas)

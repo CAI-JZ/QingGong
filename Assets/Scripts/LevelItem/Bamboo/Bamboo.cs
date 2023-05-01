@@ -64,6 +64,7 @@ public class Bamboo : MonoBehaviour,IBamboo,IBorrow
         GetTargetPos();
 #endif
         Simulate();
+        StartCoroutine(ImpluseDecrease());
     }
 
     public void AddImpluse(float dir)
@@ -101,13 +102,13 @@ public class Bamboo : MonoBehaviour,IBamboo,IBorrow
             swingDir = 0;
         }
         float force = posY / bambooHight * forceMaxValue;
-        horizForcePower = force;
-        
+        horizForcePower = force;  
     }
 
     float a = 0;
     private void GetTargetPos()
     {
+   
         if (Input.GetMouseButtonDown(0))
         {
             AddImpluse(testDir);
@@ -166,7 +167,7 @@ public class Bamboo : MonoBehaviour,IBamboo,IBorrow
         }
 
         //Constraint
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 100; i++)
         {
             ApplyConstraint();
         }
