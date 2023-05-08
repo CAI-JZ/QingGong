@@ -212,16 +212,32 @@ public class MovementController : MonoBehaviour
     {
         if (!isWallJumping && !isDashing && !isBambooJumping)
         {
+            float time = 0;
             if (inputDir.x != 0)
             {
                 // speed acceleration when input
                 currentSpeedX += inputDir.x * moveAcceleration * Time.deltaTime;
                 currentSpeedX = Mathf.Clamp(currentSpeedX, -moveClamp, moveClamp);
+
+               
+
             }
             else
             {
+                
                 //deacceleration  when not input
                 currentSpeedX = Mathf.MoveTowards(currentSpeedX, 0, deAcceleration * Time.deltaTime);
+                Debug.Log(deAcceleration * Time.deltaTime );
+                //if (currentSpeedX > 0)
+                //{
+
+                //    time += Time.deltaTime;
+                //    Debug.Log("decelerating: " + time);
+                //}
+                //else if(currentSpeedX ==0)
+                //{
+                //    Debug.Log("Decelerate " + time);
+                //}
             }
             //check wall
             if (isTouchWall)
@@ -292,7 +308,6 @@ public class MovementController : MonoBehaviour
         else
         {
             jumpInputBufferTimer -= Time.deltaTime;
-            //jumpInputBufferTimer = Mathf.Clamp(jumpInputBufferTimer, 0, jumpInputBuffer);
             if (jumpInputBufferTimer < 0) jumpInputBufferTimer = -0.1f;
 
         }
@@ -339,10 +354,7 @@ public class MovementController : MonoBehaviour
     private bool borrrowPower;
     private bool dash => dashInput && canDash && downHit && !isWallSliding;
     private bool borrow => borrrowPower && !isWallSliding;
-
     private bool doubleCheck => (rightHit && playerDir == CharDir.Right && !isOnSlope) || (leftHit && playerDir == CharDir.Left/*currentSpeedX < 0*/ && !isOnSlope);
-
-    //增加一个检测、增加一个banboo的晃动
 
     private void DashEvent()
     {
@@ -535,6 +547,7 @@ public class MovementController : MonoBehaviour
         }
         else
         {
+            canInput = false;
             bambooJumpTimer -= Time.deltaTime;
             bambooJumpTimer = Mathf.Max(bambooJumpTimer, -0.1f);
         }
@@ -548,6 +561,7 @@ public class MovementController : MonoBehaviour
         }
         else
         {
+            canInput = true;
             isBambooJumping = false;
         }
     }
@@ -577,12 +591,8 @@ public class MovementController : MonoBehaviour
             }
 
             isWallSliding = true;
-            //velocity = Vector3.zero;
             currentSpeedX = 0;
-            //currentSpeedY = Mathf.Clamp(currentSpeedY, wallSlideSpeed, float.MaxValue);
             currentSpeedY = wallSlideSpeed;
-            //currentSpeedY = currentWallSpeed;
-            //currentWallSpeed = Mathf.Lerp(currentWallSpeed,0, wallSpeedTerp);
             WallStaminaDecrease(wallStaminaMul);
         }
         else
@@ -604,6 +614,7 @@ public class MovementController : MonoBehaviour
         }
         else
         {
+            canInput = false;
             wallJumpTimer -= Time.deltaTime;
             if (wallJumpTimer < 0) wallJumpTimer = -0.1f;
         }
@@ -615,13 +626,16 @@ public class MovementController : MonoBehaviour
             float normal = 1;
             if (isClimbable)
             {
-                normal = isClimbable.normal.x;
+                normal = playerDir == CharDir.Right ? -1 : 1;
+                //normal = isClimbable.normal.x;
+                Debug.Log(normal);
             }
             else
             { 
-                normal = rightHit ? rightHit.normal.x : leftHit.normal.x; 
+                normal = rightHit ? rightHit.normal.x : leftHit.normal.x;
+                Debug.Log(normal);
             }
-
+            
             isWallJumping = true;
             isWallSliding = false;
             currentSpeedX = Mathf.Lerp(currentSpeedX, normal * wallJumpPower.x, wallJumpPower.x / wallJumpTime);
@@ -630,6 +644,7 @@ public class MovementController : MonoBehaviour
         else
         {
             isWallJumping = false;
+            canInput = true;
         }      
     }
 #endregion
@@ -717,8 +732,7 @@ public class MovementController : MonoBehaviour
             {
                 currentSpeedY = 0;
                 EndDash();
-            }
-            
+            } 
         }
     }
 
@@ -731,12 +745,9 @@ public class MovementController : MonoBehaviour
         isbamboo = Physics2D.Raycast(bambooDetect.position, Vector2.right, bambooDecRadis, (1 << 6));
         isClimbable = Physics2D.Raycast(climbableCheck.position, Vector2.right, bambooDecRadis, (1 << 8));
 
-
 #if UNITY_EDITOR
-        //Debug.DrawLine(transform.position + Vector3.down * 0.7f, transform.position + Vector3.down * (rayDisDown+0.8f), Color.red, 1);
         Debug.DrawLine(transform.position+ Vector3.down * 0.8f, transform.position + Vector3.down * 0.8f + Vector3.right * rayDis, Color.red, 1);
         Debug.DrawLine(transform.position + Vector3.down * 0.8f, transform.position + Vector3.down * 0.8f + Vector3.left * rayDis, Color.red, 1);
-        //Debug.DrawLine(bambooDetect.position, bambooDetect.position + Vector3.right * bambooDecRadis, Color.green, 1);
         Debug.DrawLine(rechargeCheck.position, rechargeCheck.position + Vector3.right * rechargeCheckDis, Color.red, 1);
 #endif
     }
